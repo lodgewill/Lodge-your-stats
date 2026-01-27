@@ -821,7 +821,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 10px 0;
         }
         .counter-label {
             font-size: 13px;
@@ -830,15 +830,15 @@
         .counter-controls {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
         }
         .counter-btn {
-            width: 32px;
-            height: 32px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             border: 1px solid var(--border-light);
             background: var(--card-bg);
-            font-size: 18px;
+            font-size: 24px;
             color: var(--text);
             cursor: pointer;
             display: flex;
@@ -849,9 +849,9 @@
             background: var(--border);
         }
         .counter-value {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 500;
-            min-width: 24px;
+            min-width: 28px;
             text-align: center;
         }
         
@@ -863,11 +863,11 @@
             margin-bottom: 12px;
         }
         .putting-card-small {
-            flex: 1;
+            flex: 0.8;
             margin: 0;
         }
         .putting-card-large {
-            flex: 1;
+            flex: 1.2;
             margin: 0;
         }
         
@@ -1273,7 +1273,7 @@
                     <option value="">Choose a course...</option>
                 </select>
             </div>
-            <button class="btn btn-primary" id="startRoundBtn" onclick="beginRound()" disabled>Start Round</button>
+            <button class="btn btn-primary" id="startRoundBtn" onclick="showFunnyModal()" disabled>Start Round</button>
             <button class="btn btn-secondary" onclick="showTab('coursesTab')">+ Add New Course</button>
         </div>
         
@@ -1709,7 +1709,13 @@
         
         function acceptAndStartRound() {
             closeFunnyModal();
-            startNewRound();
+            // If we're already on Play tab with a course selected, begin the round
+            const courseSelect = document.getElementById('courseSelect');
+            if (document.getElementById('playTab').classList.contains('active') && courseSelect && courseSelect.value) {
+                beginRound();
+            } else {
+                startNewRound();
+            }
         }
         
         // ==================== ROUND IN PROGRESS BANNER ====================
@@ -1982,9 +1988,16 @@
         }
         
         function getThreePuttColorClass(value) {
-            if (value === null) return '';
-            if (value < 0.60) return 'good';
-            if (value <= 0.80) return 'medium';
+            if (value === null || isNaN(value)) return '';
+            if (value < 1.0) return 'good';
+            if (value <= 1.5) return 'medium';
+            return 'bad';
+        }
+        
+        function getBirdieColorClass(value) {
+            if (value === null || isNaN(value)) return '';
+            if (value >= 3.0) return 'good';
+            if (value >= 2.0) return 'medium';
             return 'bad';
         }
         
@@ -2103,7 +2116,7 @@
                 { icon: 'S', name: 'Scrambling', you: scramblePct !== null ? scramblePct + '%' : '--', youSub: '', pga: '59%', color: getColorClass(scramblePct, 59) },
                 { icon: '↕', name: 'Up & Down', nameSub: '(<15m from green)', you: udPct !== null ? udPct + '%' : '--', youSub: '', pga: '80%', color: getUpDownColorClass(udPct) },
                 { icon: '🏖️', emoji: true, name: 'Sand Saves', you: sandSavesPct !== null ? sandSavesPct + '%' : '--', youSub: sandSavesAttempts > 0 ? `${sandSavesMade} of ${sandSavesAttempts}` : '', pga: '50%', color: getColorClass(sandSavesPct, 50) },
-                { icon: '🐦', emoji: true, name: 'Birdies/Round', you: birdiesPerRound, youSub: '', pga: '3.9', color: getColorClass(parseFloat(birdiesPerRound) / 3.9 * 100, 100) },
+                { icon: '🐦', emoji: true, name: 'Birdies/Round', you: birdiesPerRound, youSub: '', pga: '3.9', color: getBirdieColorClass(parseFloat(birdiesPerRound)) },
                 { icon: '③', name: 'Par 3s Avg', you: par3Avg !== '--' ? (parseFloat(par3Avg) >= 0 ? '+' : '') + par3Avg : '--', youSub: '', pga: '+0.1', colorFn: null },
                 { icon: '④', name: 'Par 4s Avg', you: par4Avg !== '--' ? (parseFloat(par4Avg) >= 0 ? '+' : '') + par4Avg : '--', youSub: '', pga: 'E', colorFn: null },
                 { icon: '⑤', name: 'Par 5s Avg', you: par5Avg !== '--' ? (parseFloat(par5Avg) >= 0 ? '+' : '') + par5Avg : '--', youSub: '', pga: '-0.6', colorFn: null }
@@ -2567,7 +2580,7 @@
                     </div>
                     <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
                         <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">3-Putts</div>
-                        <div style="font-size:18px;font-weight:500;${stats.threePutts < 1 ? 'color:var(--good);' : stats.threePutts <= 1 ? 'color:var(--medium);' : 'color:var(--bad);'}">${stats.threePutts}</div>
+                        <div style="font-size:18px;font-weight:500;${stats.threePutts < 1 ? 'color:var(--good);' : stats.threePutts <= 1.5 ? 'color:var(--medium);' : 'color:var(--bad);'}">${stats.threePutts}</div>
                         <div style="font-size:11px;color:var(--text-faint);">&nbsp;</div>
                     </div>
                     <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
@@ -2592,7 +2605,7 @@
                     </div>
                     <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
                         <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">🐦 Birdies</div>
-                        <div style="font-size:18px;font-weight:500;${stats.birdies >= 4 ? 'color:var(--good);' : stats.birdies >= 2 ? 'color:var(--medium);' : ''}">${stats.birdies}</div>
+                        <div style="font-size:18px;font-weight:500;${stats.birdies >= 3 ? 'color:var(--good);' : stats.birdies >= 2 ? 'color:var(--medium);' : 'color:var(--bad);'}">${stats.birdies}</div>
                         <div style="font-size:11px;color:var(--text-faint);">${stats.eagles > 0 ? '+' + stats.eagles + ' eagles 🦅' : ''}</div>
                     </div>
                 </div>
