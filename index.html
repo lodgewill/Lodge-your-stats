@@ -3817,7 +3817,6 @@
                 // Move current content and preview
                 const holeContent = document.getElementById('holeContent');
                 const preview = document.getElementById('holePreview');
-                const containerWidth = swipeContainer.offsetWidth;
                 
                 holeContent.style.transform = `translateX(${adjustedDelta}px)`;
                 
@@ -3844,7 +3843,7 @@
                 const shouldComplete = Math.abs(deltaX) > SWIPE_THRESHOLD;
                 
                 if (shouldComplete && swipeDirection === 'left' && currentHoleIndex < 17) {
-                    // Complete swipe to next hole
+                    // Complete swipe to next hole - animate to final position
                     holeContent.style.transform = `translateX(-${containerWidth}px)`;
                     preview.style.transform = `translateX(-${containerWidth}px)`;
                     
@@ -3854,24 +3853,39 @@
                             showCelebration(pendingCelebration);
                             pendingCelebration = null;
                         }
+                        
+                        // Update state
                         currentHoleIndex++;
                         if (scorecardVisible) {
                             scorecardVisible = false;
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
-                        renderCurrentHole();
+                        
+                        // Hide main content, rebuild it off-screen, then swap
+                        holeContent.style.visibility = 'hidden';
+                        holeContent.classList.add('dragging');
                         holeContent.style.transform = '';
-                        preview.style.transform = '';
-                        preview.innerHTML = '';
-                        preview.className = 'hole-content-preview';
-                    }, 300);
+                        
+                        renderCurrentHole();
+                        
+                        // Swap: show main content, hide preview
+                        requestAnimationFrame(() => {
+                            holeContent.style.visibility = '';
+                            holeContent.classList.remove('dragging');
+                            preview.innerHTML = '';
+                            preview.className = 'hole-content-preview';
+                            preview.style.transform = '';
+                        });
+                    }, 250);
+                    
                 } else if (shouldComplete && swipeDirection === 'right' && currentHoleIndex > 0) {
                     // Complete swipe to previous hole
                     holeContent.style.transform = `translateX(${containerWidth}px)`;
                     preview.style.transform = `translateX(${containerWidth}px)`;
                     
                     setTimeout(() => {
+                        // Update state
                         currentHoleIndex--;
                         pendingCelebration = null;
                         if (scorecardVisible) {
@@ -3879,12 +3893,24 @@
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
-                        renderCurrentHole();
+                        
+                        // Hide main content, rebuild it off-screen, then swap
+                        holeContent.style.visibility = 'hidden';
+                        holeContent.classList.add('dragging');
                         holeContent.style.transform = '';
-                        preview.style.transform = '';
-                        preview.innerHTML = '';
-                        preview.className = 'hole-content-preview';
-                    }, 300);
+                        
+                        renderCurrentHole();
+                        
+                        // Swap: show main content, hide preview
+                        requestAnimationFrame(() => {
+                            holeContent.style.visibility = '';
+                            holeContent.classList.remove('dragging');
+                            preview.innerHTML = '';
+                            preview.className = 'hole-content-preview';
+                            preview.style.transform = '';
+                        });
+                    }, 250);
+                    
                 } else {
                     // Snap back
                     holeContent.style.transform = '';
@@ -3892,7 +3918,7 @@
                     setTimeout(() => {
                         preview.innerHTML = '';
                         preview.className = 'hole-content-preview';
-                    }, 300);
+                    }, 250);
                 }
                 
                 swipeDirection = null;
