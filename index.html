@@ -1277,37 +1277,37 @@
         }
         .play-nav .btn { flex: 1; margin: 0; }
         
-        /* Hole Content Slide Animation */
-        .hole-content {
+        /* Hole Content Swipe Container */
+        .hole-swipe-container {
+            position: relative;
             overflow: hidden;
         }
-        .hole-content.slide-out-left {
-            animation: slideOutLeft 0.15s ease-out forwards;
+        .hole-content {
+            position: relative;
+            transition: transform 0.25s ease-out;
+            will-change: transform;
         }
-        .hole-content.slide-in-right {
-            animation: slideInRight 0.15s ease-out forwards;
+        .hole-content.dragging {
+            transition: none;
         }
-        .hole-content.slide-out-right {
-            animation: slideOutRight 0.15s ease-out forwards;
+        .hole-content-preview {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            pointer-events: none;
+            transition: transform 0.25s ease-out;
+            will-change: transform;
+            background: var(--bg);
         }
-        .hole-content.slide-in-left {
-            animation: slideInLeft 0.15s ease-out forwards;
+        .hole-content-preview.dragging {
+            transition: none;
         }
-        @keyframes slideOutLeft {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(-30px); opacity: 0; }
+        .hole-content-preview.next {
+            left: 100%;
         }
-        @keyframes slideInRight {
-            from { transform: translateX(30px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOutRight {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(30px); opacity: 0; }
-        }
-        @keyframes slideInLeft {
-            from { transform: translateX(-30px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .hole-content-preview.prev {
+            right: 100%;
+            left: auto;
         }
         
         /* Hole Grid */
@@ -1751,33 +1751,38 @@
                 </div>
             </div>
             
-            <!-- Hole Content (animated on swipe) -->
-            <div class="hole-content" id="holeContent">
-                <!-- Hole Info -->
-                <div class="scoring-header">
-                    <div class="hole-label">Hole</div>
-                    <div class="hole-number" id="currentHoleNum">1</div>
-                    <div class="hole-par" id="currentHolePar">Par 4</div>
-                </div>
+            <!-- Hole Swipe Container -->
+            <div class="hole-swipe-container" id="holeSwipeContainer">
+                <!-- Preview for next/prev hole -->
+                <div class="hole-content-preview" id="holePreview"></div>
                 
-                <!-- Score Input -->
-                <div class="score-input">
-                    <button class="score-btn" onclick="adjustScore(-1)">−</button>
-                    <div class="score-current">
-                        <div class="score-current-num" id="currentScore">4</div>
-                        <div class="score-current-label" id="currentScoreLabel">Par</div>
+                <!-- Hole Content (animated on swipe) -->
+                <div class="hole-content" id="holeContent">
+                    <!-- Hole Info -->
+                    <div class="scoring-header">
+                        <div class="hole-label">Hole</div>
+                        <div class="hole-number" id="currentHoleNum">1</div>
+                        <div class="hole-par" id="currentHolePar">Par 4</div>
                     </div>
-                    <button class="score-btn" onclick="adjustScore(1)">+</button>
-                </div>
-                
-                <!-- Fairway Hit (Par 4 and 5 only) -->
-                <div class="stat-card" id="fairwayCard">
-                    <div class="stat-card-title">Fairway Hit?</div>
-                    <div class="yes-no-row">
-                        <button class="yes-no-btn" id="fairwayYes" onclick="setFairway(true)">Yes</button>
-                        <button class="yes-no-btn" id="fairwayNo" onclick="setFairway(false)">No</button>
+                    
+                    <!-- Score Input -->
+                    <div class="score-input">
+                        <button class="score-btn" onclick="adjustScore(-1)">−</button>
+                        <div class="score-current">
+                            <div class="score-current-num" id="currentScore">4</div>
+                            <div class="score-current-label" id="currentScoreLabel">Par</div>
+                        </div>
+                        <button class="score-btn" onclick="adjustScore(1)">+</button>
                     </div>
-                </div>
+                    
+                    <!-- Fairway Hit (Par 4 and 5 only) -->
+                    <div class="stat-card" id="fairwayCard">
+                        <div class="stat-card-title">Fairway Hit?</div>
+                        <div class="yes-no-row">
+                            <button class="yes-no-btn" id="fairwayYes" onclick="setFairway(true)">Yes</button>
+                            <button class="yes-no-btn" id="fairwayNo" onclick="setFairway(false)">No</button>
+                        </div>
+                    </div>
                 
                 <!-- Putts and Gettable Putts side by side -->
                 <div class="putting-row">
@@ -1834,6 +1839,7 @@
                     </div>
                 </div>
             </div>
+        </div>
             
             <!-- Navigation -->
             <div class="play-nav">
@@ -2959,24 +2965,17 @@
             if (targetIndex === currentHoleIndex) return;
             
             const holeContent = document.getElementById('holeContent');
+            const containerWidth = document.getElementById('holeSwipeContainer').offsetWidth;
             const goingForward = targetIndex > currentHoleIndex;
             
-            // Slide out
-            holeContent.classList.add(goingForward ? 'slide-out-left' : 'slide-out-right');
+            // Quick slide animation
+            holeContent.style.transform = `translateX(${goingForward ? -containerWidth : containerWidth}px)`;
             
             setTimeout(() => {
                 currentHoleIndex = targetIndex;
                 pendingCelebration = null;
                 renderCurrentHole();
-                
-                // Slide in
-                holeContent.classList.remove('slide-out-left', 'slide-out-right');
-                holeContent.classList.add(goingForward ? 'slide-in-right' : 'slide-in-left');
-                
-                setTimeout(() => {
-                    holeContent.classList.remove('slide-in-right', 'slide-in-left');
-                }, 150);
-                
+                holeContent.style.transform = '';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }, 150);
         }
@@ -3529,29 +3528,21 @@
         function prevHole() {
             if (currentHoleIndex > 0) {
                 const holeContent = document.getElementById('holeContent');
+                const containerWidth = document.getElementById('holeSwipeContainer').offsetWidth;
                 
-                // Slide out to right
-                holeContent.classList.add('slide-out-right');
+                // Quick slide animation
+                holeContent.style.transform = `translateX(${containerWidth}px)`;
                 
                 setTimeout(() => {
                     currentHoleIndex--;
                     pendingCelebration = null;
-                    // Hide scorecard
                     if (scorecardVisible) {
                         scorecardVisible = false;
                         document.getElementById('scorecardContainer').classList.remove('show');
                         document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                     }
                     renderCurrentHole();
-                    
-                    // Slide in from left
-                    holeContent.classList.remove('slide-out-right');
-                    holeContent.classList.add('slide-in-left');
-                    
-                    setTimeout(() => {
-                        holeContent.classList.remove('slide-in-left');
-                    }, 150);
-                    
+                    holeContent.style.transform = '';
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }, 150);
             }
@@ -3566,28 +3557,20 @@
             
             if (currentHoleIndex < 17) {
                 const holeContent = document.getElementById('holeContent');
+                const containerWidth = document.getElementById('holeSwipeContainer').offsetWidth;
                 
-                // Slide out to left
-                holeContent.classList.add('slide-out-left');
+                // Quick slide animation
+                holeContent.style.transform = `translateX(-${containerWidth}px)`;
                 
                 setTimeout(() => {
                     currentHoleIndex++;
-                    // Hide scorecard
                     if (scorecardVisible) {
                         scorecardVisible = false;
                         document.getElementById('scorecardContainer').classList.remove('show');
                         document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                     }
                     renderCurrentHole();
-                    
-                    // Slide in from right
-                    holeContent.classList.remove('slide-out-left');
-                    holeContent.classList.add('slide-in-right');
-                    
-                    setTimeout(() => {
-                        holeContent.classList.remove('slide-in-right');
-                    }, 150);
-                    
+                    holeContent.style.transform = '';
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }, 150);
             } else {
@@ -3749,37 +3732,170 @@
         
         // ==================== SWIPE GESTURE HANDLING ====================
         let touchStartX = 0;
-        let touchEndX = 0;
-        const SWIPE_THRESHOLD = 50;
+        let touchCurrentX = 0;
+        let isDragging = false;
+        let swipeDirection = null;
+        const SWIPE_THRESHOLD = 80;
         
-        function handleSwipeGesture() {
-            const diff = touchStartX - touchEndX;
-            if (Math.abs(diff) < SWIPE_THRESHOLD) return;
+        function getPreviewContent(holeIndex) {
+            if (!state.currentRound || holeIndex < 0 || holeIndex > 17) return '';
+            const hole = state.currentRound.holes[holeIndex];
+            const score = hole.score || hole.par;
+            const diff = score - hole.par;
+            let scoreLabel = 'Par', labelClass = '';
+            if (score === 0 || score === hole.par) { scoreLabel = 'Par'; }
+            else if (diff <= -2) { scoreLabel = 'Eagle!'; labelClass = 'eagle'; }
+            else if (diff === -1) { scoreLabel = 'Birdie!'; labelClass = 'birdie'; }
+            else if (diff === 1) { scoreLabel = 'Bogey'; labelClass = 'bogey'; }
+            else if (diff >= 2) { scoreLabel = 'Double'; labelClass = 'double-bogey'; }
             
-            if (diff > 0) {
-                // Swiped left - go to next hole
-                if (state.currentRound && currentHoleIndex < 17) {
-                    nextHole();
-                }
-            } else {
-                // Swiped right - go to previous hole
-                if (state.currentRound && currentHoleIndex > 0) {
-                    prevHole();
-                }
-            }
+            return `
+                <div class="scoring-header">
+                    <div class="hole-label">Hole</div>
+                    <div class="hole-number">${hole.hole}</div>
+                    <div class="hole-par">Par ${hole.par}</div>
+                </div>
+                <div class="score-input">
+                    <button class="score-btn" style="opacity:0.5;">−</button>
+                    <div class="score-current">
+                        <div class="score-current-num">${score}</div>
+                        <div class="score-current-label ${labelClass}">${scoreLabel}</div>
+                    </div>
+                    <button class="score-btn" style="opacity:0.5;">+</button>
+                </div>
+                <div style="text-align:center;padding:40px 20px;color:var(--text-lighter);font-size:14px;">
+                    ${hole.score > 0 ? '✓ Scored' : 'Swipe to view'}
+                </div>
+            `;
         }
         
         function setupSwipeListeners() {
-            const playActive = document.getElementById('playActive');
-            if (!playActive) return;
+            const swipeContainer = document.getElementById('holeSwipeContainer');
+            if (!swipeContainer) return;
             
-            playActive.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
+            swipeContainer.addEventListener('touchstart', (e) => {
+                if (!state.currentRound) return;
+                touchStartX = e.touches[0].clientX;
+                touchCurrentX = touchStartX;
+                isDragging = true;
+                swipeDirection = null;
+                
+                const holeContent = document.getElementById('holeContent');
+                const preview = document.getElementById('holePreview');
+                holeContent.classList.add('dragging');
+                preview.classList.add('dragging');
             }, { passive: true });
             
-            playActive.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipeGesture();
+            swipeContainer.addEventListener('touchmove', (e) => {
+                if (!isDragging || !state.currentRound) return;
+                
+                touchCurrentX = e.touches[0].clientX;
+                const deltaX = touchCurrentX - touchStartX;
+                
+                // Determine swipe direction
+                if (Math.abs(deltaX) > 10 && swipeDirection === null) {
+                    swipeDirection = deltaX > 0 ? 'right' : 'left';
+                    
+                    // Setup preview content
+                    const preview = document.getElementById('holePreview');
+                    if (swipeDirection === 'left' && currentHoleIndex < 17) {
+                        preview.innerHTML = getPreviewContent(currentHoleIndex + 1);
+                        preview.className = 'hole-content-preview next dragging';
+                    } else if (swipeDirection === 'right' && currentHoleIndex > 0) {
+                        preview.innerHTML = getPreviewContent(currentHoleIndex - 1);
+                        preview.className = 'hole-content-preview prev dragging';
+                    }
+                }
+                
+                // Apply resistance at boundaries
+                let adjustedDelta = deltaX;
+                if ((swipeDirection === 'left' && currentHoleIndex >= 17) ||
+                    (swipeDirection === 'right' && currentHoleIndex <= 0)) {
+                    adjustedDelta = deltaX * 0.2; // Resistance effect
+                }
+                
+                // Move current content and preview
+                const holeContent = document.getElementById('holeContent');
+                const preview = document.getElementById('holePreview');
+                const containerWidth = swipeContainer.offsetWidth;
+                
+                holeContent.style.transform = `translateX(${adjustedDelta}px)`;
+                
+                if (swipeDirection === 'left') {
+                    preview.style.transform = `translateX(${adjustedDelta}px)`;
+                } else if (swipeDirection === 'right') {
+                    preview.style.transform = `translateX(${adjustedDelta}px)`;
+                }
+            }, { passive: true });
+            
+            swipeContainer.addEventListener('touchend', (e) => {
+                if (!isDragging || !state.currentRound) return;
+                isDragging = false;
+                
+                const holeContent = document.getElementById('holeContent');
+                const preview = document.getElementById('holePreview');
+                const deltaX = touchCurrentX - touchStartX;
+                const containerWidth = swipeContainer.offsetWidth;
+                
+                holeContent.classList.remove('dragging');
+                preview.classList.remove('dragging');
+                
+                // Determine if swipe should complete
+                const shouldComplete = Math.abs(deltaX) > SWIPE_THRESHOLD;
+                
+                if (shouldComplete && swipeDirection === 'left' && currentHoleIndex < 17) {
+                    // Complete swipe to next hole
+                    holeContent.style.transform = `translateX(-${containerWidth}px)`;
+                    preview.style.transform = `translateX(-${containerWidth}px)`;
+                    
+                    setTimeout(() => {
+                        // Trigger celebration if pending
+                        if (pendingCelebration) {
+                            showCelebration(pendingCelebration);
+                            pendingCelebration = null;
+                        }
+                        currentHoleIndex++;
+                        if (scorecardVisible) {
+                            scorecardVisible = false;
+                            document.getElementById('scorecardContainer').classList.remove('show');
+                            document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
+                        }
+                        renderCurrentHole();
+                        holeContent.style.transform = '';
+                        preview.style.transform = '';
+                        preview.innerHTML = '';
+                        preview.className = 'hole-content-preview';
+                    }, 300);
+                } else if (shouldComplete && swipeDirection === 'right' && currentHoleIndex > 0) {
+                    // Complete swipe to previous hole
+                    holeContent.style.transform = `translateX(${containerWidth}px)`;
+                    preview.style.transform = `translateX(${containerWidth}px)`;
+                    
+                    setTimeout(() => {
+                        currentHoleIndex--;
+                        pendingCelebration = null;
+                        if (scorecardVisible) {
+                            scorecardVisible = false;
+                            document.getElementById('scorecardContainer').classList.remove('show');
+                            document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
+                        }
+                        renderCurrentHole();
+                        holeContent.style.transform = '';
+                        preview.style.transform = '';
+                        preview.innerHTML = '';
+                        preview.className = 'hole-content-preview';
+                    }, 300);
+                } else {
+                    // Snap back
+                    holeContent.style.transform = '';
+                    preview.style.transform = '';
+                    setTimeout(() => {
+                        preview.innerHTML = '';
+                        preview.className = 'hole-content-preview';
+                    }, 300);
+                }
+                
+                swipeDirection = null;
             }, { passive: true });
         }
         
