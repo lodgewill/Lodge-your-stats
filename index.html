@@ -5,26 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="theme-color" content="#f2f2f2">
+    <meta name="theme-color" content="#1c4932">
     <title>Golf Stats</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         :root {
-            --bg: #f2f2f2;
-            --text: #1a1a1a;
-            --text-light: #999;
-            --text-lighter: #bbb;
-            --text-faint: #ccc;
+            --bg: #ffffff;
+            --text: #333;
+            --text-light: #666;
+            --text-lighter: #888;
+            --text-faint: #aaa;
             --border: #e8e8e8;
             --border-light: #ddd;
             --card-bg: #fff;
-            --good: #22c55e;
-            --medium: #eab308;
-            --bad: #ef4444;
+            --masters-green: #1c4932;
+            --masters-yellow: #FCE300;
+            --masters-red: #BA0C2F;
+            --good: #1c4932;
+            --medium: #B8860B;
+            --bad: #BA0C2F;
         }
         
         body {
@@ -39,7 +42,7 @@
         
         /* Header */
         .header {
-            padding: 16px 24px 12px;
+            padding: 16px 20px 16px;
             position: relative;
         }
         .header-row {
@@ -49,27 +52,29 @@
         }
         .app-name {
             font-size: 13px;
-            color: var(--text-light);
-            font-weight: 400;
+            color: var(--masters-green);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .tagline {
-            font-size: 9px;
+            font-size: 10px;
             color: var(--text-lighter);
             font-style: italic;
-            margin-top: 2px;
+            margin-top: 4px;
         }
         .greeting {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--text);
             margin-top: 12px;
             font-weight: 400;
         }
         .profile-btn {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: #e8e8e8;
-            border: 1px solid var(--border-light);
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -78,19 +83,18 @@
             cursor: pointer;
         }
         .profile-btn.has-initial {
-            background: var(--text);
-            color: #fff;
-            border: none;
-            font-weight: 500;
-            font-size: 13px;
+            background: var(--masters-green);
+            color: var(--masters-yellow);
+            font-weight: 600;
+            font-size: 14px;
         }
         
         /* Round in Progress Banner */
         .round-in-progress-banner {
             display: none;
-            background: var(--text);
+            background: var(--masters-green);
             color: #fff;
-            padding: 12px 24px;
+            padding: 12px 20px;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 8px;
@@ -106,164 +110,297 @@
         }
         .continue-scoring-btn {
             font-size: 12px;
-            color: #fff;
-            background: rgba(255,255,255,0.2);
+            color: var(--masters-green);
+            background: var(--masters-yellow);
             border: none;
             padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
             font-family: inherit;
+            font-weight: 600;
         }
         .continue-scoring-btn:active {
-            background: rgba(255,255,255,0.3);
+            background: #e6cc00;
         }
         
-        /* Score Hero */
+        /* Score Hero - Card style with gradient and stripe */
         .score-hero {
-            padding: 0 24px;
-            margin: 8px 0;
+            text-align: center;
+            padding: 24px 20px;
+            background: linear-gradient(180deg, #f8f8f8 0%, #ffffff 100%);
+            border-radius: 20px;
+            margin: 0 20px 16px;
+            border: 2px solid #e8e8e8;
+            position: relative;
+            overflow: hidden;
         }
-        .score-hero-row {
-            display: inline-flex;
-            align-items: flex-start;
-            gap: 4px;
+        .score-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--masters-green) 0%, var(--masters-green) 50%, var(--masters-yellow) 50%, var(--masters-yellow) 100%);
         }
         .score-giant {
-            font-size: 96px;
-            font-weight: 300;
-            letter-spacing: -6px;
-            line-height: 0.85;
-            color: var(--text);
+            font-size: 72px;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--masters-green);
         }
         .score-to-par {
             font-size: 18px;
-            color: var(--text-lighter);
-            font-weight: 400;
+            color: var(--masters-green);
+            font-weight: 500;
             margin-top: 8px;
         }
         .score-meta {
-            font-size: 14px;
-            color: var(--text-light);
+            font-size: 13px;
+            color: var(--text-lighter);
             margin-top: 8px;
-            padding: 0 24px;
         }
         
         .divider {
-            height: 1px;
-            background: var(--border-light);
-            margin: 28px 24px;
+            display: none;
         }
         
-        /* Mini Stats */
+        /* Mini Stats - Card style with icons */
         .mini-stats {
             display: flex;
             justify-content: space-between;
-            padding: 0 24px;
+            gap: 10px;
+            padding: 0 20px;
+            margin-bottom: 16px;
         }
-        .mini-stat { text-align: center; flex: 1; }
+        .mini-stat {
+            flex: 1;
+            text-align: center;
+            background: #f8f8f8;
+            border-radius: 12px;
+            padding: 14px 8px;
+            border: 1px solid #e8e8e8;
+        }
+        .mini-stat-icon {
+            width: 32px;
+            height: 32px;
+            margin: 0 auto 8px;
+            background: var(--masters-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--masters-yellow);
+        }
+        .mini-stat-icon.golf-ball {
+            color: #fff;
+            font-size: 14px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
         .mini-stat-label {
             font-size: 10px;
             color: var(--text-lighter);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin-top: 4px;
         }
         .mini-stat-value {
-            font-size: 20px;
-            font-weight: 500;
-            color: var(--text);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--masters-green);
         }
-        .mini-stat-value.good { color: var(--good); }
+        .mini-stat-value.good { color: var(--masters-green); }
         .mini-stat-value.medium { color: var(--medium); }
-        .mini-stat-value.bad { color: var(--bad); }
+        .mini-stat-value.bad { color: var(--masters-red); }
         .mini-stat-sub {
             font-size: 9px;
             color: var(--text-faint);
             margin-top: 2px;
         }
         
-        /* Section */
+        /* Section Header with green underline and badge */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 20px 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--masters-green);
+        }
         .section-title {
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 11px;
+            color: var(--masters-green);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+        .section-badge {
+            font-size: 11px;
+            background: var(--masters-yellow);
+            color: var(--masters-green);
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .section-badge:empty {
+            display: none;
+        }
+        
+        /* Recent Rounds List - matches stat-list style */
+        .recent-rounds-list {
+            background: #f8f8f8;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e8e8e8;
+            margin: 0 20px;
+        }
+        .recent-round-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fff;
+            cursor: pointer;
+        }
+        .recent-round-row:last-child {
+            border-bottom: none;
+        }
+        .recent-round-row:nth-child(odd) {
+            background: #fafafa;
+        }
+        .recent-round-row:active {
+            background: #f0f0f0;
+        }
+        .recent-round-info .course-name {
+            font-size: 14px;
             color: var(--text);
-            margin: 28px 24px 16px;
+            font-weight: 500;
+        }
+        .recent-round-info .round-date {
+            font-size: 10px;
+            color: var(--text-lighter);
+            margin-top: 2px;
+        }
+        .recent-round-scores {
+            display: flex;
+            gap: 16px;
+            align-items: baseline;
+        }
+        .recent-round-scores .score {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--masters-green);
+            min-width: 32px;
+            text-align: right;
+        }
+        .recent-round-scores .to-par {
+            font-size: 12px;
+            color: var(--masters-green);
+            font-weight: 500;
+            min-width: 32px;
+            text-align: right;
         }
         
         /* Buttons */
         .btn {
             display: block;
-            width: calc(100% - 48px);
-            margin: 0 24px;
-            padding: 16px;
+            width: calc(100% - 40px);
+            margin: 0 20px;
+            padding: 16px 20px;
             border: none;
             font-family: inherit;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             border-radius: 12px;
             text-align: center;
         }
         .btn-primary {
-            background: var(--text);
+            background: var(--masters-green);
             color: #fff;
         }
         .btn-secondary {
-            background: var(--card-bg);
-            color: var(--text);
-            border: 1px solid var(--border-light);
+            background: #f8f8f8;
+            color: var(--masters-green);
+            border: 2px solid var(--masters-green);
         }
         .btn-danger {
-            background: var(--card-bg);
-            color: var(--bad);
-            border: 1px solid var(--bad);
+            background: transparent;
+            color: var(--masters-red);
+            border: 2px solid var(--masters-red);
         }
         .btn:active { transform: scale(0.98); }
         .btn + .btn { margin-top: 12px; }
         
-        /* List Items */
-        .list-container { padding: 0 24px; }
+        /* List Items - Card style with alternating backgrounds */
+        .list-container { 
+            padding: 0 20px;
+        }
         .list-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 0;
-            border-bottom: 1px solid var(--border);
+            padding: 14px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fff;
             cursor: pointer;
         }
-        .list-item:last-child { border-bottom: none; }
+        .list-item:first-child {
+            border-radius: 12px 12px 0 0;
+            border: 1px solid #e8e8e8;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        .list-item:last-child {
+            border-radius: 0 0 12px 12px;
+            border: 1px solid #e8e8e8;
+            border-top: none;
+        }
+        .list-item:only-child {
+            border-radius: 12px;
+            border: 1px solid #e8e8e8;
+        }
+        .list-item:not(:first-child):not(:last-child) {
+            border-left: 1px solid #e8e8e8;
+            border-right: 1px solid #e8e8e8;
+        }
+        .list-item:nth-child(odd) {
+            background: #fafafa;
+        }
         .list-item-title {
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 14px;
+            font-weight: 600;
             color: var(--text);
         }
         .list-item-sub {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-lighter);
             margin-top: 2px;
         }
         .list-item-right { text-align: right; }
         .list-item-score {
-            font-size: 32px;
-            font-weight: 300;
-            color: var(--text);
-            letter-spacing: -1px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--masters-green);
         }
         .list-item-par {
             font-size: 12px;
-            color: var(--text-light);
+            color: var(--text-lighter);
+            font-weight: 500;
         }
         
-        /* Navigation */
+        /* Navigation - Green bar with yellow active */
         .nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--bg);
-            border-top: 1px solid #e0e0e0;
+            background: var(--masters-green);
             display: flex;
-            padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+            justify-content: space-around;
+            padding: 16px 20px calc(12px + env(safe-area-inset-bottom, 0px));
             z-index: 100;
         }
         .nav-item {
@@ -272,18 +409,18 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            color: var(--text-lighter);
-            font-size: 9px;
-            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            font-size: 10px;
+            font-weight: 500;
             letter-spacing: 0.5px;
             cursor: pointer;
         }
-        .nav-item.active { color: var(--text); }
+        .nav-item.active { color: var(--masters-yellow); }
         .nav-icon {
-            width: 26px;
-            height: 26px;
-            border: 1.5px solid currentColor;
-            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -291,9 +428,8 @@
             font-style: normal;
         }
         .nav-item.active .nav-icon {
-            background: var(--text);
-            border-color: var(--text);
-            color: #fff;
+            background: var(--masters-yellow);
+            color: var(--masters-green);
         }
         
         /* Tabs */
@@ -301,19 +437,19 @@
         .tab.active { display: block; }
         
         /* Profile Page */
-        .profile-page { display: none; padding: 0 24px; }
+        .profile-page { display: none; padding: 0 20px; }
         .profile-page.active { display: block; }
         .profile-avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: var(--text);
-            color: #fff;
+            background: var(--masters-green);
+            color: var(--masters-yellow);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            font-weight: 300;
+            font-weight: 600;
             margin: 24px auto;
         }
         .profile-avatar.empty {
@@ -325,25 +461,26 @@
         .form-group { margin-bottom: 24px; }
         .form-label {
             font-size: 11px;
-            color: var(--text-light);
+            color: var(--masters-green);
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
             display: block;
         }
         .form-input, .form-select {
             width: 100%;
             padding: 14px 16px;
-            border: 1px solid var(--border-light);
-            border-radius: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
             font-family: inherit;
-            font-size: 16px;
+            font-size: 15px;
             background: var(--card-bg);
             color: var(--text);
         }
         .form-input:focus, .form-select:focus {
             outline: none;
-            border-color: var(--text);
+            border-color: var(--masters-green);
         }
         
         /* Toggle */
@@ -373,7 +510,7 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .toggle-switch.on { background: var(--good); }
+        .toggle-switch.on { background: var(--masters-green); }
         .toggle-switch::after {
             content: '';
             position: absolute;
@@ -392,7 +529,7 @@
         .filter-row {
             display: flex;
             gap: 8px;
-            padding: 0 24px;
+            padding: 0 20px;
             margin-bottom: 16px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -401,48 +538,64 @@
         .pill {
             padding: 8px 14px;
             border-radius: 20px;
-            font-size: 12px;
-            color: var(--text-light);
-            background: var(--card-bg);
-            border: 1px solid var(--border-light);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--masters-green);
+            background: #fff;
+            border: 2px solid var(--masters-green);
             cursor: pointer;
             white-space: nowrap;
             flex-shrink: 0;
         }
         .pill.active {
-            background: var(--text);
-            color: #fff;
-            border-color: var(--text);
+            background: var(--masters-green);
+            color: var(--masters-yellow);
+            border-color: var(--masters-green);
         }
         .rounds-badge {
             font-size: 11px;
-            color: var(--text-light);
-            padding: 0 24px;
-            margin-bottom: 20px;
+            color: var(--text-lighter);
+            padding: 0 20px;
+            margin-bottom: 16px;
         }
-        .rounds-badge span { color: var(--text); font-weight: 500; }
+        .rounds-badge span { color: var(--masters-green); font-weight: 600; }
         
         .stats-header {
             display: flex;
             justify-content: space-between;
-            padding: 0 24px 12px;
+            padding: 0 36px 10px 20px;
             font-size: 10px;
             color: var(--text-lighter);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--border);
+            letter-spacing: 1px;
         }
         .stats-header-right {
             display: flex;
-            gap: 32px;
+            gap: 20px;
         }
         
+        /* Stat rows - Card style with alternating backgrounds */
         .stat-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 24px;
-            border-bottom: 1px solid var(--border);
+            padding: 14px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fff;
+            margin: 0 20px;
+            border-left: 1px solid #e8e8e8;
+            border-right: 1px solid #e8e8e8;
+        }
+        .stat-row:first-of-type {
+            border-radius: 12px 12px 0 0;
+            border-top: 1px solid #e8e8e8;
+        }
+        .stat-row:last-of-type {
+            border-radius: 0 0 12px 12px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        .stat-row:nth-child(odd) {
+            background: #fafafa;
         }
         .stat-left {
             display: flex;
@@ -459,6 +612,7 @@
         .stat-name {
             font-size: 14px;
             color: var(--text);
+            font-weight: 500;
         }
         .stat-name-sub {
             font-size: 10px;
@@ -468,24 +622,24 @@
         .stat-right {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 16px;
         }
-        .stat-you-container { text-align: right; min-width: 50px; }
+        .stat-you-container { text-align: right; min-width: 48px; }
         .stat-you {
             font-size: 16px;
-            font-weight: 500;
-            color: var(--text);
+            font-weight: 600;
+            color: var(--masters-green);
         }
-        .stat-you.good { color: var(--good); }
+        .stat-you.good { color: var(--masters-green); }
         .stat-you.medium { color: var(--medium); }
-        .stat-you.bad { color: var(--bad); }
+        .stat-you.bad { color: var(--masters-red); }
         .stat-you-sub {
             font-size: 10px;
             color: var(--text-faint);
             margin-top: 1px;
         }
         .stat-pga {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-lighter);
             min-width: 40px;
             text-align: right;
@@ -494,7 +648,7 @@
         /* Custom Date Filter */
         .custom-dates {
             display: none;
-            padding: 0 24px 16px;
+            padding: 0 20px 16px;
             gap: 12px;
         }
         .custom-dates.show { display: flex; }
@@ -502,246 +656,466 @@
         .custom-dates input[type="date"] {
             width: 100%;
             padding: 10px 12px;
-            border: 1px solid var(--border-light);
+            border: 2px solid var(--border-light);
             border-radius: 8px;
             font-family: inherit;
             font-size: 14px;
             background: var(--card-bg);
         }
         
-        /* Play Tab */
+        /* Play Tab - Progress Bar */
         .progress-bar {
-            background: var(--text);
-            padding: 16px 24px;
+            background: var(--masters-green);
+            padding: 16px 20px;
             margin-bottom: 0;
         }
         .progress-track {
-            height: 3px;
+            height: 6px;
             background: rgba(255,255,255,0.2);
-            border-radius: 2px;
+            border-radius: 3px;
+            overflow: hidden;
         }
         .progress-fill {
             height: 100%;
-            background: #fff;
-            border-radius: 2px;
+            background: var(--masters-yellow);
+            border-radius: 3px;
             transition: width 0.3s;
         }
         .progress-info {
             display: flex;
             justify-content: space-between;
-            margin-top: 12px;
+            margin-top: 10px;
         }
         .progress-text {
-            font-size: 11px;
-            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
         }
         .live-score {
             font-size: 14px;
             font-weight: 600;
-            color: #fff;
-            background: rgba(255,255,255,0.15);
-            padding: 4px 12px;
-            border-radius: 12px;
+            color: var(--masters-yellow);
         }
         
         /* Scorecard Expand */
         .scorecard-toggle {
             display: flex;
             justify-content: center;
-            padding: 12px 24px;
+            padding: 12px 20px;
             background: var(--bg);
         }
         .scorecard-toggle-btn {
             font-size: 12px;
-            color: var(--text-light);
-            background: none;
-            border: 1px solid var(--border-light);
+            color: var(--masters-green);
+            background: #fff;
+            border: 2px solid var(--masters-green);
             padding: 8px 16px;
             border-radius: 8px;
             cursor: pointer;
             font-family: inherit;
+            font-weight: 600;
         }
         .scorecard-toggle-btn:active {
-            background: var(--border);
+            background: #f8f8f8;
         }
         
-        /* Classic Scorecard */
+        /* Masters Scoreboard - Realistic 3D Style */
         .scorecard-container {
             display: none;
-            padding: 0 16px 16px;
+            padding: 8px 8px 16px;
             overflow-x: auto;
         }
         .scorecard-container.show {
             display: block;
         }
+        
+        /* Outer scene with sky and grass */
+        .masters-scoreboard-scene {
+            background: linear-gradient(180deg, 
+                #87CEEB 0%, 
+                #a8d4ea 30%,
+                #c8e4c8 55%,
+                #228B22 58%,
+                #1a7a1a 100%);
+            border-radius: 12px;
+            padding: 12px 8px 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Cloud effects */
+        .masters-scoreboard-scene::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 15%;
+            width: 50px;
+            height: 16px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 16px;
+            filter: blur(6px);
+        }
+        .masters-scoreboard-scene::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            right: 20%;
+            width: 35px;
+            height: 12px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 12px;
+            filter: blur(5px);
+        }
+        
+        /* The scoreboard structure */
+        .masters-scoreboard {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+        
+        /* Board wrapper contains both front and back 9 */
+        .masters-board-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        /* Posts on sides */
+        .masters-post-left,
+        .masters-post-right {
+            width: 6px;
+            background: linear-gradient(90deg, #d8d8d8 0%, #ffffff 40%, #e8e8e8 100%);
+            border-radius: 3px 3px 0 0;
+            box-shadow: 2px 3px 6px rgba(0,0,0,0.25);
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+        .masters-post-left::before,
+        .masters-post-right::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+        }
+        
+        /* Main board */
+        .masters-board {
+            background: #FFFFFF;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            overflow: visible;
+            position: relative;
+        }
+        
+        /* Top board with curved header */
+        .masters-board-top {
+            border-radius: 50% 50% 0 0 / 35px 35px 0 0;
+        }
+        
+        /* Bottom board */
+        .masters-board-bottom {
+            border-radius: 0 0 6px 6px;
+        }
+        
+        /* LEADERS header with curved top */
+        .masters-leaders-header {
+            background: #FFFFFF;
+            text-align: center;
+            padding: 14px 0 10px;
+            position: relative;
+            border-bottom: 3px solid #1a1a1a;
+            border-radius: 50% 50% 0 0 / 35px 35px 0 0;
+        }
+        
+        .masters-leaders-header span {
+            font-family: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: #1a1a1a;
+            letter-spacing: 12px;
+            text-indent: 12px;
+            display: block;
+            position: relative;
+            z-index: 2;
+        }
+        
         .classic-scorecard {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
-            background: #fff;
-            border: 1px solid #333;
+            font-size: 14px;
+            background: #FFFFFF;
+            table-layout: fixed;
         }
         .classic-scorecard th,
         .classic-scorecard td {
-            border: 1px solid #999;
-            padding: 6px 4px;
+            padding: 2px 1px;
             text-align: center;
-            min-width: 28px;
+            width: 26px;
+            border: 1px solid #c5c5c5;
+            font-family: 'Arial Black', Arial, sans-serif;
+            background: #FFFFFF;
         }
-        .classic-scorecard th {
-            background: #f5f5f5;
-            font-weight: 500;
-            color: var(--text);
+        
+        /* Header row - HOLE */
+        .classic-scorecard .hole-header th {
+            background: #FFFFFF;
+            color: #1a1a1a;
+            font-weight: 900;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            padding: 3px 1px;
+            border-bottom: 2px solid #1a1a1a;
         }
-        .classic-scorecard .hole-header {
-            background: #333;
-            color: #fff;
-            font-weight: 600;
+        .classic-scorecard .hole-header .label-cell {
+            width: 52px;
+            min-width: 52px;
+            text-align: left;
+            padding-left: 6px;
+            font-size: 15px;
+            border-right: 2px solid #1a1a1a;
         }
+        
+        /* PAR row */
         .classic-scorecard .par-row td {
-            background: #f9f9f9;
-            color: var(--text-light);
+            background: #FFFFFF;
+            color: #1a1a1a;
+            font-weight: 900;
+            font-size: 17px;
+            padding: 3px 1px;
+            border-bottom: 2px solid #1a1a1a;
         }
+        .classic-scorecard .par-row .label-cell {
+            text-align: left;
+            padding-left: 6px;
+            font-weight: 900;
+            font-size: 15px;
+            border-right: 2px solid #1a1a1a;
+        }
+        
+        /* Score row - plain white cells */
+        .classic-scorecard .score-row td {
+            background: #FFFFFF;
+            color: #1a1a1a;
+            font-weight: 900;
+            font-size: 17px;
+            padding: 3px 1px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+        .classic-scorecard .score-row .label-cell {
+            text-align: left;
+            padding-left: 6px;
+            font-size: 15px;
+            color: #1a1a1a;
+            background: #FFFFFF;
+            border-right: 2px solid #1a1a1a;
+        }
+        
+        /* Cumulative to par row - plain white cells */
+        .classic-scorecard .cumulative-row td {
+            background: #FFFFFF;
+            font-weight: 900;
+            font-size: 17px;
+            padding: 3px 1px;
+            color: #006747;
+        }
+        .classic-scorecard .cumulative-row .label-cell {
+            text-align: left;
+            padding-left: 6px;
+            font-size: 15px;
+            font-weight: 900;
+            border-right: 2px solid #1a1a1a;
+            color: #BA0C2F;
+            background: #FFFFFF;
+        }
+        .classic-scorecard .cumulative-row .under-par {
+            color: #c41e3a;
+        }
+        .classic-scorecard .cumulative-row .over-par {
+            color: #006747;
+        }
+        .classic-scorecard .cumulative-row .even-par {
+            color: #006747;
+        }
+        
+        /* Score styling - circles for under par, squares for over */
         .classic-scorecard .score-cell {
             position: relative;
-            font-weight: 500;
+            font-weight: 900;
         }
         .classic-scorecard .birdie {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--good);
+            width: 22px;
+            height: 22px;
+            border: 2px solid #c41e3a;
             border-radius: 50%;
-            color: var(--good);
+            color: #c41e3a;
+            background: transparent;
+            font-weight: 900;
+            font-size: 14px;
         }
         .classic-scorecard .eagle {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--good);
+            width: 22px;
+            height: 22px;
+            border: 2px solid #c41e3a;
             border-radius: 50%;
-            color: var(--good);
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--good);
+            color: #c41e3a;
+            background: transparent;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #c41e3a;
         }
         .classic-scorecard .bogey {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--bad);
-            color: var(--bad);
+            width: 22px;
+            height: 22px;
+            border: 2px solid #1a1a1a;
+            border-radius: 0;
+            color: #1a1a1a;
+            background: transparent;
+            font-weight: 900;
+            font-size: 14px;
         }
         .classic-scorecard .double-bogey {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--bad);
-            color: var(--bad);
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--bad);
-        }
-        .classic-scorecard .total-col {
-            background: #f5f5f5;
-            font-weight: 600;
-        }
-        .classic-scorecard .diff-cell {
-            font-size: 10px;
-            color: var(--text-light);
-        }
-        .classic-scorecard .diff-cell.under { color: var(--good); }
-        .classic-scorecard .diff-cell.over { color: var(--bad); }
-        .classic-scorecard .hole-num-cell {
-            min-width: 28px;
-            padding: 6px 4px;
-        }
-        .classic-scorecard .hole-num-cell:hover {
-            background: var(--border);
-        }
-        .classic-scorecard .hole-num-cell:active {
-            background: var(--border-light);
+            width: 22px;
+            height: 22px;
+            border: 2px solid #1a1a1a;
+            border-radius: 0;
+            color: #1a1a1a;
+            background: transparent;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #1a1a1a;
         }
         
+        /* Clickable hole cells */
+        .classic-scorecard .hole-num-cell {
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .classic-scorecard .hole-num-cell:hover {
+            background: #f0f0f0 !important;
+        }
+        .classic-scorecard .hole-num-cell:active {
+            background: #e0e0e0 !important;
+        }
+        .classic-scorecard .hole-num-cell.incomplete {
+            background: #BA0C2F !important;
+            color: #fff !important;
+        }
+        
+        /* Total cells (OUT, IN, TOT) */
+        .classic-scorecard .total-cell {
+            background: #FFFFFF !important;
+            font-weight: 900;
+            border-left: 2px solid #1a1a1a;
+        }
+        .classic-scorecard .hole-header .total-cell {
+            background: #FFFFFF !important;
+            color: #c41e3a;
+            padding: 1px !important;
+            font-size: 13px;
+        }
+        .classic-scorecard .cumulative-row .total-cell {
+            border-bottom: none;
+        }
+        
+        /* Scoring Header */
         .scoring-header {
             text-align: center;
-            padding: 24px 0 20px;
+            padding: 20px 0;
         }
         .hole-label {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-lighter);
             text-transform: uppercase;
             letter-spacing: 2px;
         }
         .hole-number {
-            font-size: 72px;
-            font-weight: 300;
-            color: var(--text);
-            margin: 4px 0;
+            font-size: 64px;
+            font-weight: 700;
+            color: var(--masters-green);
+            margin: 8px 0;
             line-height: 1;
         }
         .hole-par {
             font-size: 14px;
-            color: var(--text-light);
+            color: var(--text-lighter);
         }
         
         .score-input {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 32px;
-            padding: 24px 24px 20px;
-            background: var(--card-bg);
+            gap: 24px;
+            padding: 20px;
+            background: #f8f8f8;
             border-radius: 16px;
-            margin: 0 24px 16px;
+            margin: 0 20px 12px;
+            border: 1px solid #e8e8e8;
         }
         .score-btn {
             width: 56px;
             height: 56px;
             border-radius: 50%;
-            border: 1px solid var(--border-light);
-            background: var(--card-bg);
+            border: 2px solid var(--masters-green);
+            background: #fff;
             font-size: 24px;
-            color: var(--text);
+            color: var(--masters-green);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .score-btn:active { background: var(--border); }
+        .score-btn:active { background: #f8f8f8; }
         .score-current { text-align: center; }
         .score-current-num {
-            font-size: 64px;
-            font-weight: 300;
-            color: var(--text);
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--masters-green);
         }
         .score-current-label {
-            font-size: 13px;
-            color: var(--text-light);
-            margin-top: 4px;
+            font-size: 11px;
+            color: var(--masters-green);
+            font-weight: 600;
+            margin-top: 2px;
         }
-        .score-current-label.birdie { color: var(--good); }
-        .score-current-label.eagle { color: var(--good); font-weight: 600; }
+        .score-current-label.birdie { color: var(--masters-green); }
+        .score-current-label.eagle { color: var(--masters-green); }
         .score-current-label.bogey { color: var(--medium); }
-        .score-current-label.double-bogey { color: var(--bad); }
+        .score-current-label.double-bogey { color: var(--masters-red); }
         
         /* Stat Cards */
         .stat-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin: 0 24px 12px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 0 20px 10px;
+            border: 1px solid #e8e8e8;
         }
         .stat-card-title {
             font-size: 11px;
-            color: var(--text-light);
+            color: var(--masters-green);
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .stat-card-subtitle {
             font-size: 10px;
@@ -758,28 +1132,30 @@
         }
         .yes-no-btn {
             flex: 1;
-            padding: 12px 16px;
-            border: 1px solid var(--border-light);
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 12px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 13px;
             font-family: inherit;
-            background: var(--card-bg);
-            color: var(--text);
+            font-weight: 600;
+            background: #f8f8f8;
+            color: var(--text-lighter);
             cursor: pointer;
             transition: all 0.15s;
+            text-align: center;
         }
         .yes-no-btn:active {
             transform: scale(0.98);
         }
         .yes-no-btn.selected-yes {
-            background: #dcfce7;
-            border-color: var(--good);
-            color: var(--good);
+            background: var(--masters-green);
+            border-color: var(--masters-green);
+            color: #fff;
         }
         .yes-no-btn.selected-no {
-            background: #fee2e2;
-            border-color: var(--bad);
-            color: var(--bad);
+            background: var(--masters-red);
+            border-color: var(--masters-red);
+            color: #fff;
         }
         .yes-no-btn.single {
             flex: 0 0 auto;
@@ -803,17 +1179,17 @@
         .putt-btn {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            border: 1px solid var(--border-light);
-            background: var(--card-bg);
+            border-radius: 8px;
+            border: 2px solid #e8e8e8;
+            background: #f8f8f8;
             font-size: 16px;
-            color: var(--text);
+            color: var(--text-lighter);
             cursor: pointer;
         }
         .putt-btn.active {
-            background: var(--text);
+            background: var(--masters-green);
             color: #fff;
-            border-color: var(--text);
+            border-color: var(--masters-green);
         }
         
         /* Counter Input */
@@ -833,33 +1209,34 @@
             gap: 16px;
         }
         .counter-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 1px solid var(--border-light);
-            background: var(--card-bg);
-            font-size: 24px;
-            color: var(--text);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 2px solid var(--masters-green);
+            background: #fff;
+            font-size: 18px;
+            color: var(--masters-green);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .counter-btn:active {
-            background: var(--border);
+            background: #f0f0f0;
         }
         .counter-value {
             font-size: 20px;
-            font-weight: 500;
+            font-weight: 600;
             min-width: 28px;
             text-align: center;
+            color: var(--masters-green);
         }
         
         /* Putting row - side by side */
         .putting-row {
             display: flex;
             gap: 12px;
-            padding: 0 24px;
+            padding: 0 20px;
             margin-bottom: 12px;
         }
         .putting-card-small {
@@ -896,7 +1273,7 @@
         .play-nav {
             display: flex;
             gap: 12px;
-            padding: 0 24px;
+            padding: 0 20px;
             margin-bottom: 12px;
         }
         .play-nav .btn { flex: 1; margin: 0; }
@@ -908,17 +1285,19 @@
         
         /* Course Setup */
         .setup-card {
-            background: var(--card-bg);
+            background: #f8f8f8;
             border-radius: 16px;
             padding: 20px;
-            margin: 0 24px 16px;
+            margin: 0 20px 12px;
+            border: 1px solid #e8e8e8;
         }
         .setup-card-title {
             font-size: 11px;
-            color: var(--text-light);
+            color: var(--masters-green);
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
         
         /* Celebration */
@@ -1017,16 +1396,16 @@
             border-radius: 12px;
             font-family: inherit;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            border: 1px solid var(--border-light);
-            background: var(--card-bg);
-            color: var(--text);
+            border: 2px solid #e8e8e8;
+            background: #f8f8f8;
+            color: var(--text-lighter);
         }
         .modal-btn.primary {
-            background: var(--text);
+            background: var(--masters-green);
             color: #fff;
-            border-color: var(--text);
+            border-color: var(--masters-green);
         }
         .modal-btn:active {
             transform: scale(0.98);
@@ -1041,43 +1420,65 @@
         }
         .summary-header {
             text-align: center;
-            padding: 24px;
-            background: var(--text);
-            color: #fff;
+            padding: 24px 20px;
+            background: linear-gradient(180deg, #f8f8f8 0%, #fff 100%);
+            border-radius: 16px;
+            margin: 0 20px 16px;
+            border: 2px solid #e8e8e8;
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--masters-green) 0%, var(--masters-green) 50%, var(--masters-yellow) 50%, var(--masters-yellow) 100%);
         }
         .summary-title {
-            font-size: 12px;
+            font-size: 11px;
+            color: var(--text-lighter);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.7;
-            margin-bottom: 8px;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
         }
         .summary-score {
-            font-size: 64px;
-            font-weight: 300;
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--masters-green);
         }
         .summary-to-par {
-            font-size: 18px;
-            opacity: 0.8;
+            font-size: 16px;
+            color: var(--masters-green);
+            font-weight: 600;
             margin-top: 4px;
         }
         .summary-course {
-            font-size: 14px;
-            opacity: 0.6;
-            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-lighter);
+            margin-top: 8px;
         }
         .summary-section-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text);
-            padding: 20px 24px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--masters-green);
+            padding: 20px 20px 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid var(--masters-green);
+            margin: 0 20px;
         }
         
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 40px 24px;
+            padding: 40px 20px;
             color: var(--text-light);
+        }
+        .recent-rounds-list .empty-state {
+            padding: 24px 20px;
         }
         .empty-state-icon {
             font-size: 48px;
@@ -1094,7 +1495,7 @@
             border-bottom: 1px solid var(--border);
         }
         .course-item:last-child { border-bottom: none; }
-        .course-name { font-weight: 500; color: var(--text); }
+        .course-name { font-weight: 600; color: var(--text); }
         .course-par { font-size: 12px; color: var(--text-light); margin-top: 2px; }
         .course-delete {
             padding: 8px;
@@ -1111,16 +1512,17 @@
             display: block;
         }
         .history-back {
-            padding: 16px 24px;
-            font-size: 14px;
-            color: var(--text-light);
+            padding: 0 20px 16px 4px;
+            font-size: 13px;
+            color: var(--masters-green);
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: 500;
         }
         .history-back:active {
-            color: var(--text);
+            opacity: 0.7;
         }
         .history-list-view {
             display: block;
@@ -1129,14 +1531,15 @@
             display: none;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <!-- ==================== HEADER ==================== -->
     <header class="header" id="mainHeader">
         <div class="header-row">
             <div>
-                <div class="app-name">Lodge your stats</div>
-                <div class="tagline">"Drive for show, putt for dough."</div>
+                <div class="app-name">Golf Stats</div>
+                <div class="tagline">"Drive for show, putt for dough"</div>
                 <div class="greeting" id="greeting"></div>
             </div>
             <div class="profile-btn" id="profileBtn" onclick="showProfile()">👤</div>
@@ -1218,44 +1621,43 @@
     <!-- ==================== HOME TAB ==================== -->
     <div class="tab active" id="homeTab">
         <div class="score-hero" id="scoreHero">
-            <div class="score-hero-row">
-                <div class="score-giant" id="homeScore">--</div>
-                <div class="score-to-par" id="homeToPar"></div>
-            </div>
+            <div class="score-giant" id="homeScore">--</div>
+            <div class="score-to-par" id="homeToPar"></div>
+            <div class="score-meta" id="homeMeta">No rounds yet</div>
         </div>
-        <div class="score-meta" id="homeMeta">No rounds yet</div>
-        
-        <div class="divider"></div>
         
         <div class="mini-stats">
             <div class="mini-stat">
-                <div class="mini-stat-label">Fairways</div>
+                <div class="mini-stat-icon">⛳</div>
                 <div class="mini-stat-value" id="homeFairways">--%</div>
-                <div class="mini-stat-sub" id="homeFairwaysSub">&nbsp;</div>
+                <div class="mini-stat-label">Fairways</div>
             </div>
             <div class="mini-stat">
-                <div class="mini-stat-label">GIR</div>
+                <div class="mini-stat-icon">🎯</div>
                 <div class="mini-stat-value" id="homeGir">--%</div>
-                <div class="mini-stat-sub" id="homeGirSub">&nbsp;</div>
+                <div class="mini-stat-label">GIR</div>
             </div>
             <div class="mini-stat">
-                <div class="mini-stat-label">Putts</div>
+                <div class="mini-stat-icon golf-ball">●</div>
                 <div class="mini-stat-value" id="homePutts">--</div>
-                <div class="mini-stat-sub" id="homePuttsSub">&nbsp;</div>
+                <div class="mini-stat-label">Putts</div>
             </div>
             <div class="mini-stat">
-                <div class="mini-stat-label">🐦 Birdies</div>
+                <div class="mini-stat-icon">🐦</div>
                 <div class="mini-stat-value" id="homeBirdies">0</div>
-                <div class="mini-stat-sub">&nbsp;</div>
+                <div class="mini-stat-label">Birdies</div>
             </div>
         </div>
         
-        <div style="margin-top:28px;">
+        <div style="margin-top:8px;">
             <button class="btn btn-primary" onclick="showFunnyModal()">Start New Round</button>
         </div>
         
-        <div class="section-title">Recent Rounds</div>
-        <div class="list-container" id="recentRounds">
+        <div class="section-header">
+            <span class="section-title">Recent Rounds</span>
+            <span class="section-badge" id="recentRoundsBadge"></span>
+        </div>
+        <div class="recent-rounds-list" id="recentRounds">
             <div class="empty-state">
                 <div class="empty-state-icon">⛳</div>
                 <div>Play your first round!</div>
@@ -1297,7 +1699,23 @@
             
             <!-- Classic Scorecard -->
             <div class="scorecard-container" id="scorecardContainer">
-                <table class="classic-scorecard" id="classicScorecard"></table>
+                <div class="masters-scoreboard-scene">
+                    <div class="masters-scoreboard">
+                        <div class="masters-post-left"></div>
+                        <div class="masters-board-wrapper">
+                            <!-- Front 9 Section -->
+                            <div class="masters-board masters-board-top">
+                                <div class="masters-leaders-header"><span>LEADERS</span></div>
+                                <table class="classic-scorecard" id="classicScorecardFront"></table>
+                            </div>
+                            <!-- Back 9 Section -->
+                            <div class="masters-board masters-board-bottom">
+                                <table class="classic-scorecard" id="classicScorecardBack"></table>
+                            </div>
+                        </div>
+                        <div class="masters-post-right"></div>
+                    </div>
+                </div>
             </div>
             
             <!-- Hole Info -->
@@ -1456,18 +1874,39 @@
             <div class="summary-to-par" id="summaryToPar"></div>
             <div class="summary-course" id="summaryCourse"></div>
         </div>
-        <div class="summary-section-title">Scorecard</div>
-        <div class="scorecard-container show" style="margin-bottom:0;">
-            <table class="classic-scorecard" id="summaryScorecard"></table>
+        <div class="section-header" style="margin-top:0;">
+            <span class="section-title">Scorecard</span>
         </div>
-        <div class="summary-section-title">Statistics</div>
-        <div id="summaryStats" style="padding: 0 24px 24px;"></div>
+        <div class="scorecard-container show" style="margin-bottom:0;">
+            <div class="masters-scoreboard-scene">
+                <div class="masters-scoreboard">
+                    <div class="masters-post-left"></div>
+                    <div class="masters-board-wrapper">
+                        <!-- Front 9 Section -->
+                        <div class="masters-board masters-board-top">
+                            <div class="masters-leaders-header"><span>LEADERS</span></div>
+                            <table class="classic-scorecard" id="summaryScorecardFront"></table>
+                        </div>
+                        <!-- Back 9 Section -->
+                        <div class="masters-board masters-board-bottom">
+                            <table class="classic-scorecard" id="summaryScorecardBack"></table>
+                        </div>
+                    </div>
+                    <div class="masters-post-right"></div>
+                </div>
+            </div>
+        </div>
+        <div class="section-header">
+            <span class="section-title">Statistics</span>
+        </div>
+        <div id="summaryStats" style="padding: 0 20px 24px;"></div>
         <button class="btn btn-primary" onclick="closeSummary()" style="margin-bottom: 24px;">Done</button>
     </div>
 
     <!-- ==================== COURSES TAB ==================== -->
     <div class="tab" id="coursesTab">
-        <div class="header">
+        <div class="header" style="position:relative;">
+            <div class="history-back" onclick="showTab('playTab')" style="position:absolute;left:0;top:50%;transform:translateY(-50%);">← Back</div>
             <div class="app-name">Courses</div>
         </div>
         
@@ -1482,31 +1921,29 @@
             <button class="btn btn-primary" onclick="addCourse()" style="width:100%;margin:0;">Add Course</button>
         </div>
         
-        <div class="section-title">Your Courses</div>
+        <div class="section-header" style="margin-top:8px;">
+            <span class="section-title">Your Courses</span>
+        </div>
         <div class="list-container" id="coursesList"></div>
     </div>
 
     <!-- ==================== NAVIGATION ==================== -->
     <nav class="nav" id="mainNav">
         <div class="nav-item active" onclick="showTab('homeTab')">
-            <div class="nav-icon">⌂</div>
+            <span class="nav-icon">⌂</span>
             Home
         </div>
         <div class="nav-item" onclick="showTab('playTab')">
-            <div class="nav-icon">▶</div>
+            <span class="nav-icon">▶</span>
             Play
         </div>
         <div class="nav-item" onclick="showTab('statsTab')">
-            <div class="nav-icon">≡</div>
+            <span class="nav-icon">◈</span>
             Stats
         </div>
         <div class="nav-item" onclick="showTab('historyTab')">
-            <div class="nav-icon">↺</div>
+            <span class="nav-icon">≡</span>
             History
-        </div>
-        <div class="nav-item" onclick="showTab('coursesTab')">
-            <div class="nav-icon">⚑</div>
-            Courses
         </div>
     </nav>
 
@@ -1540,7 +1977,8 @@
                 { id: 3, name: 'Yas Links', pars: [4,5,4,3,4,4,5,3,4,4,5,4,3,4,4,4,3,5] }
             ],
             rounds: [],
-            currentRound: null
+            currentRound: null,
+            editingRoundIndex: null
         };
         
         let currentHoleIndex = 0;
@@ -1548,6 +1986,7 @@
         let scorecardVisible = false;
         let pendingCelebration = null;
         let finishAttempted = false;
+        let editingRoundIndex = null;
         
         // ==================== STORAGE ====================
         function loadState() {
@@ -1586,6 +2025,8 @@
                             if (h.fromBunker === undefined) h.fromBunker = h.sand || false;
                         });
                     });
+                    // Restore editingRoundIndex from state
+                    editingRoundIndex = state.editingRoundIndex || null;
                 }
             } catch (e) { console.error('Load error:', e); }
             
@@ -1721,8 +2162,14 @@
         // ==================== ROUND IN PROGRESS BANNER ====================
         function updateRoundBanner(tabId) {
             const banner = document.getElementById('roundBanner');
+            const bannerText = document.querySelector('.round-in-progress-text');
+            const continueBtn = document.querySelector('.continue-scoring-btn');
+            
             if (state.currentRound && tabId !== 'playTab') {
                 banner.classList.add('show');
+                const isEditing = editingRoundIndex !== null;
+                bannerText.textContent = isEditing ? '✏️ Editing Round' : '⛳ Round in Progress';
+                continueBtn.textContent = isEditing ? 'Continue editing →' : 'Continue scoring →';
             } else {
                 banner.classList.remove('show');
             }
@@ -1758,8 +2205,10 @@
             
             document.getElementById(tabId).classList.add('active');
             
-            const navMap = { homeTab: 0, playTab: 1, statsTab: 2, historyTab: 3, coursesTab: 4 };
-            document.querySelectorAll('.nav-item')[navMap[tabId]].classList.add('active');
+            const navMap = { homeTab: 0, playTab: 1, statsTab: 2, historyTab: 3 };
+            if (navMap[tabId] !== undefined) {
+                document.querySelectorAll('.nav-item')[navMap[tabId]].classList.add('active');
+            }
             
             updateRoundBanner(tabId);
             
@@ -1780,12 +2229,13 @@
                 document.getElementById('homeToPar').textContent = '';
                 document.getElementById('homeMeta').textContent = 'No rounds yet';
                 document.getElementById('homeFairways').textContent = '--%';
-                document.getElementById('homeFairwaysSub').innerHTML = '&nbsp;';
+                document.getElementById('homeFairways').className = 'mini-stat-value';
                 document.getElementById('homeGir').textContent = '--%';
-                document.getElementById('homeGirSub').innerHTML = '&nbsp;';
+                document.getElementById('homeGir').className = 'mini-stat-value';
                 document.getElementById('homePutts').textContent = '--';
-                document.getElementById('homePuttsSub').innerHTML = '&nbsp;';
+                document.getElementById('homePutts').className = 'mini-stat-value';
                 document.getElementById('homeBirdies').textContent = '0';
+                document.getElementById('recentRoundsBadge').textContent = '';
                 document.getElementById('recentRounds').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⛳</div><div>Play your first round!</div></div>';
                 return;
             }
@@ -1801,41 +2251,41 @@
             
             const date = new Date(lastRound.date);
             const dateStr = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-            document.getElementById('homeMeta').textContent = `Last round · ${lastRound.courseName} · ${dateStr}`;
+            document.getElementById('homeMeta').textContent = `${lastRound.courseName} • ${dateStr}`;
             
             // Calculate stats from last round
             const stats = calculateRoundStats(lastRound);
             
             document.getElementById('homeFairways').textContent = stats.fwPct !== null ? stats.fwPct + '%' : '--%';
             document.getElementById('homeFairways').className = 'mini-stat-value ' + getColorClass(stats.fwPct, 60);
-            document.getElementById('homeFairwaysSub').textContent = stats.fwTotal > 0 ? `${stats.fwHit} of ${stats.fwTotal}` : '';
             
             document.getElementById('homeGir').textContent = stats.girPct !== null ? stats.girPct + '%' : '--%';
             document.getElementById('homeGir').className = 'mini-stat-value ' + getColorClass(stats.girPct, 66);
-            document.getElementById('homeGirSub').textContent = stats.girTotal > 0 ? `${stats.girHit} of ${stats.girTotal}` : '';
             
             document.getElementById('homePutts').textContent = stats.totalPutts || '--';
             document.getElementById('homePutts').className = 'mini-stat-value ' + getColorClassInverse(stats.totalPutts, 29);
-            document.getElementById('homePuttsSub').textContent = stats.totalPutts ? (stats.totalPutts / 18).toFixed(2) + '/hole' : '';
             
             document.getElementById('homeBirdies').textContent = stats.birdies;
             
             // Recent rounds
             const recent = [...state.rounds].reverse().slice(0, 5);
-            document.getElementById('recentRounds').innerHTML = recent.map((r, idx) => {
+            document.getElementById('recentRoundsBadge').textContent = recent.length > 0 ? recent.length : '';
+            document.getElementById('recentRounds').innerHTML = recent.length === 0 
+                ? '<div class="empty-state"><div class="empty-state-icon">⛳</div><div>Play your first round!</div></div>'
+                : recent.map((r, idx) => {
                 const c = state.courses.find(x => x.id === r.courseId);
                 const par = c ? c.pars.reduce((a,b)=>a+b,0) : 72;
                 const tp = r.totalScore - par;
                 const tpStr = tp === 0 ? 'E' : (tp > 0 ? '+' + tp : tp);
                 const d = new Date(r.date);
-                return `<div class="list-item" onclick="showRoundDetail(${state.rounds.length - 1 - idx})">
-                    <div>
-                        <div class="list-item-title">${r.courseName}</div>
-                        <div class="list-item-sub">${d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                return `<div class="recent-round-row" onclick="showRoundDetail(${state.rounds.length - 1 - idx})">
+                    <div class="recent-round-info">
+                        <div class="course-name">${r.courseName}</div>
+                        <div class="round-date">${d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
                     </div>
-                    <div class="list-item-right">
-                        <div class="list-item-score">${r.totalScore || '--'}</div>
-                        <div class="list-item-par">${tpStr}</div>
+                    <div class="recent-round-scores">
+                        <span class="score">${r.totalScore || '--'}</span>
+                        <span class="to-par">${tpStr}</span>
                     </div>
                 </div>`;
             }).join('');
@@ -2091,6 +2541,11 @@
             
             const fwPct = fwTotal > 0 ? Math.round(fwHit / fwTotal * 100) : null;
             const girPct = girTotal > 0 ? Math.round(girHit / girTotal * 100) : null;
+            
+            // Per-round averages for sub-text
+            const fwPerRound = fwPct !== null ? Math.round(fwPct * 14 / 100) : null; // Based on standard 14 fairways
+            const girPerRound = rounds.length > 0 ? Math.round(girHit / rounds.length) : null;
+            
             const puttsPerRound = rounds.length > 0 && totalPutts > 0 ? (totalPutts / rounds.length).toFixed(1) : '--';
             const puttsPerHole = holesWithPutts > 0 ? (totalPutts / holesWithPutts).toFixed(2) : '--';
             const gettablePct = gettableTotal > 0 ? Math.round(gettableMade / gettableTotal * 100) : null;
@@ -2107,15 +2562,15 @@
             // Build stats rows
             const stats = [
                 { icon: '—', name: 'Scoring Avg', you: avgScore, youSub: avgToParStr, pga: '71.5', colorFn: null },
-                { icon: '| |', name: 'Fairways', you: fwPct !== null ? fwPct + '%' : '--', youSub: fwTotal > 0 ? `${fwHit} of ${fwTotal}` : '', pga: '60%', color: getColorClass(fwPct, 60) },
-                { icon: '◉', name: 'GIR', you: girPct !== null ? girPct + '%' : '--', youSub: girTotal > 0 ? `${girHit} of ${girTotal}` : '', pga: '66%', color: getColorClass(girPct, 66) },
+                { icon: '| |', name: 'Fairways', you: fwPct !== null ? fwPct + '%' : '--', youSub: fwPerRound !== null ? `${fwPerRound} of 14` : '', pga: '60%', color: getColorClass(fwPct, 60) },
+                { icon: '◉', name: 'GIR', you: girPct !== null ? girPct + '%' : '--', youSub: girPerRound !== null ? `${girPerRound} of 18` : '', pga: '66%', color: getColorClass(girPct, 66) },
                 { icon: '○', name: 'Putts/Round', you: puttsPerRound, youSub: '', pga: '29.0', color: getColorClassInverse(parseFloat(puttsPerRound), 29) },
                 { icon: '◦', name: 'Putts/Hole', you: puttsPerHole, youSub: '', pga: '1.60', color: getColorClassInverse(parseFloat(puttsPerHole), 1.6) },
                 { icon: '③', name: '3-Putts/Round', you: threePuttsPerRound, youSub: '', pga: '0.49', color: getThreePuttColorClass(parseFloat(threePuttsPerRound)) },
                 { icon: '◐', name: 'Gettable Putts', nameSub: '(4-12ft)', you: gettablePct !== null ? gettablePct + '%' : '--', youSub: '', pga: '65%', color: getColorClass(gettablePct, 65) },
                 { icon: 'S', name: 'Scrambling', you: scramblePct !== null ? scramblePct + '%' : '--', youSub: '', pga: '59%', color: getColorClass(scramblePct, 59) },
                 { icon: '↕', name: 'Up & Down', nameSub: '(<15m from green)', you: udPct !== null ? udPct + '%' : '--', youSub: '', pga: '80%', color: getUpDownColorClass(udPct) },
-                { icon: '🏖️', emoji: true, name: 'Sand Saves', you: sandSavesPct !== null ? sandSavesPct + '%' : '--', youSub: sandSavesAttempts > 0 ? `${sandSavesMade} of ${sandSavesAttempts}` : '', pga: '50%', color: getColorClass(sandSavesPct, 50) },
+                { icon: '🏖️', emoji: true, name: 'Sand Saves', you: sandSavesPct !== null ? sandSavesPct + '%' : '--', youSub: '', pga: '50%', color: getColorClass(sandSavesPct, 50) },
                 { icon: '🐦', emoji: true, name: 'Birdies/Round', you: birdiesPerRound, youSub: '', pga: '3.9', color: getBirdieColorClass(parseFloat(birdiesPerRound)) },
                 { icon: '③', name: 'Par 3s Avg', you: par3Avg !== '--' ? (parseFloat(par3Avg) >= 0 ? '+' : '') + par3Avg : '--', youSub: '', pga: '+0.1', colorFn: null },
                 { icon: '④', name: 'Par 4s Avg', you: par4Avg !== '--' ? (parseFloat(par4Avg) >= 0 ? '+' : '') + par4Avg : '--', youSub: '', pga: 'E', colorFn: null },
@@ -2188,21 +2643,126 @@
             const stats = calculateRoundStats(round);
             
             document.getElementById('historyDetailContent').innerHTML = `
-                <div class="summary-header">
-                    <div class="summary-title">${d.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                    <div class="summary-score">${round.totalScore || '--'}</div>
-                    <div class="summary-to-par">${toParStr}</div>
-                    <div class="summary-course">${round.courseName}</div>
+                <div id="shareableContent" style="background:var(--bg);padding-bottom:24px;">
+                    <div class="summary-header">
+                        <div class="summary-title">${d.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                        <div class="summary-score">${round.totalScore || '--'}</div>
+                        <div class="summary-to-par">${toParStr}</div>
+                        <div class="summary-course">${round.courseName}</div>
+                    </div>
+                    <div class="section-header" style="margin-top:0;">
+                        <span class="section-title">Scorecard</span>
+                    </div>
+                    <div class="scorecard-container show" style="margin-bottom:0;">
+                        ${generateScorecardHTML(round, course, getPlayerLastName())}
+                    </div>
+                    <div class="section-header">
+                        <span class="section-title">Statistics</span>
+                    </div>
+                    <div style="padding: 0 20px 0;">
+                        ${generateStatsHTML(stats)}
+                    </div>
+                    <div style="text-align:center;padding:16px 20px 0;color:var(--text-faint);font-size:11px;">Golf Stats ⛳</div>
                 </div>
-                <div class="summary-section-title">Scorecard</div>
-                <div class="scorecard-container show" style="margin-bottom:0;">
-                    ${generateScorecardHTML(round, course)}
+                <div style="padding: 0 20px 12px;">
+                    <button class="btn btn-primary" onclick="shareRoundImage()">📤 Share Round</button>
                 </div>
-                <div class="summary-section-title">Statistics</div>
-                <div style="padding: 0 24px 24px;">
-                    ${generateStatsHTML(stats)}
+                <div style="padding: 0 20px 12px;">
+                    <button class="btn btn-secondary" onclick="editRound(${roundIndex})">✏️ Edit Round</button>
+                </div>
+                <div style="padding: 0 20px 40px;">
+                    <button class="btn btn-danger" onclick="deleteRound(${roundIndex})">Delete Round</button>
                 </div>
             `;
+        }
+        
+        async function shareRoundImage() {
+            const element = document.getElementById('shareableContent');
+            if (!element) return;
+            
+            try {
+                // Show loading state
+                const shareBtn = event.target;
+                const originalText = shareBtn.textContent;
+                shareBtn.textContent = 'Generating...';
+                shareBtn.disabled = true;
+                
+                // Capture the element as canvas
+                const canvas = await html2canvas(element, {
+                    backgroundColor: '#fafaf9',
+                    scale: 2,
+                    logging: false,
+                    useCORS: true
+                });
+                
+                // Convert to blob
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                
+                // Check if native share is available with files
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'round.png', { type: 'image/png' })] })) {
+                    const file = new File([blob], 'golf-round.png', { type: 'image/png' });
+                    await navigator.share({
+                        files: [file],
+                        title: 'My Golf Round',
+                        text: 'Check out my golf round!'
+                    });
+                } else {
+                    // Fallback: download the image
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'golf-round.png';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    alert('Image downloaded! You can share it manually.');
+                }
+                
+                shareBtn.textContent = originalText;
+                shareBtn.disabled = false;
+            } catch (err) {
+                console.error('Share failed:', err);
+                alert('Unable to share. Please try again.');
+                event.target.textContent = '📤 Share Round';
+                event.target.disabled = false;
+            }
+        }
+        
+        function deleteRound(roundIndex) {
+            if (!confirm('Are you sure you want to permanently delete this round? This cannot be undone.')) return;
+            
+            state.rounds.splice(roundIndex, 1);
+            saveState();
+            
+            hideHistoryDetail();
+            updateHistoryTab();
+            updateStatsTab();
+            updateHomeTab();
+        }
+        
+        function editRound(roundIndex) {
+            const round = state.rounds[roundIndex];
+            if (!round) return;
+            
+            // Check if there's already a round in progress
+            if (state.currentRound) {
+                if (!confirm('You have a round in progress. Editing this round will discard any unsaved progress. Continue?')) {
+                    return;
+                }
+            }
+            
+            // Deep copy the round data to currentRound for editing
+            state.currentRound = JSON.parse(JSON.stringify(round));
+            editingRoundIndex = roundIndex;
+            state.editingRoundIndex = roundIndex;
+            currentHoleIndex = 0;
+            scorecardVisible = false;
+            finishAttempted = false;
+            
+            saveState();
+            
+            // Hide history detail and switch to play tab
+            hideHistoryDetail();
+            showTab('playTab');
         }
         
         function hideHistoryDetail() {
@@ -2319,6 +2879,8 @@
             currentHoleIndex = 0;
             scorecardVisible = false;
             finishAttempted = false;
+            editingRoundIndex = null;
+            state.editingRoundIndex = null;
             saveState();
             updatePlayTab();
         }
@@ -2333,7 +2895,18 @@
         function renderScorecard() {
             if (!state.currentRound) return;
             const course = state.courses.find(c => c.id === state.currentRound.courseId);
-            document.getElementById('classicScorecard').innerHTML = generatePlayScorecardContent(state.currentRound, course);
+            const playerName = getPlayerLastName();
+            const content = generatePlayScorecardContent(state.currentRound, course, playerName);
+            document.getElementById('classicScorecardFront').innerHTML = content.front;
+            document.getElementById('classicScorecardBack').innerHTML = content.back;
+        }
+        
+        function getPlayerLastName() {
+            if (state.profile && state.profile.name && state.profile.name.trim()) {
+                const parts = state.profile.name.trim().split(' ');
+                return parts[parts.length - 1].toUpperCase();
+            }
+            return null;
         }
         
         function goToHole(holeNum) {
@@ -2343,34 +2916,37 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
-        function generateScorecardHTML(round, course) {
-            return `<table class="classic-scorecard">${generateScorecardTableContent(round, course)}</table>`;
+        function generateScorecardHTML(round, course, playerName) {
+            const content = generateScorecardTableContentSplit(round, course, playerName);
+            return `
+                <div class="masters-scoreboard-scene">
+                    <div class="masters-scoreboard">
+                        <div class="masters-post-left"></div>
+                        <div class="masters-board-wrapper">
+                            <!-- Front 9 Section -->
+                            <div class="masters-board masters-board-top">
+                                <div class="masters-leaders-header"><span>LEADERS</span></div>
+                                <table class="classic-scorecard">${content.front}</table>
+                            </div>
+                            <!-- Back 9 Section -->
+                            <div class="masters-board masters-board-bottom">
+                                <table class="classic-scorecard">${content.back}</table>
+                            </div>
+                        </div>
+                        <div class="masters-post-right"></div>
+                    </div>
+                </div>
+            `;
         }
         
-        function generatePlayScorecardContent(round, course) {
+        function generatePlayScorecardContent(round, course, playerName) {
             const front9 = round.holes.slice(0, 9);
             const back9 = round.holes.slice(9, 18);
-            
-            const front9Par = front9.reduce((a, h) => a + h.par, 0);
-            const back9Par = back9.reduce((a, h) => a + h.par, 0);
-            const front9Score = front9.reduce((a, h) => a + (h.score || 0), 0);
-            const back9Score = back9.reduce((a, h) => a + (h.score || 0), 0);
-            const totalScore = front9Score + back9Score;
-            
-            // Calculate +/- only for holes with scores
-            const front9Played = front9.filter(h => h.score > 0);
-            const back9Played = back9.filter(h => h.score > 0);
-            const front9PlayedPar = front9Played.reduce((a, h) => a + h.par, 0);
-            const back9PlayedPar = back9Played.reduce((a, h) => a + h.par, 0);
-            const front9PlayedScore = front9Played.reduce((a, h) => a + h.score, 0);
-            const back9PlayedScore = back9Played.reduce((a, h) => a + h.score, 0);
-            const totalPlayedPar = front9PlayedPar + back9PlayedPar;
-            const totalPlayedScore = front9PlayedScore + back9PlayedScore;
+            const nameLabel = playerName || 'TO PAR';
             
             function isHoleIncomplete(hole) {
                 if (hole.score === 0 || hole.score === null) return true;
                 if (hole.par >= 4 && hole.fairway === null) return true;
-                if ((hole.putts === null || hole.putts === 0) && hole.score > 0) return true;
                 if (hole.upDownAttempt === true && hole.upDownMade === null) return true;
                 return false;
             }
@@ -2378,9 +2954,9 @@
             function getHoleCellStyle(hole) {
                 const incomplete = isHoleIncomplete(hole);
                 if (finishAttempted && incomplete) {
-                    return 'background:var(--bad);color:#fff;border:1px solid #fff;';
+                    return 'background:#BA0C2F;color:#fff;';
                 }
-                return 'background:#1a1a1a;color:#fff;border:1px solid #fff;';
+                return '';
             }
             
             function getScoreDisplay(hole) {
@@ -2393,87 +2969,124 @@
                 return hole.score;
             }
             
-            function getDiffDisplay(hole) {
-                if (hole.score === null || hole.score === 0) return '-';
-                const diff = hole.score - hole.par;
-                if (diff === 0) return 'E';
-                const cls = diff < 0 ? 'under' : 'over';
-                return `<span class="${cls}">${diff > 0 ? '+' : ''}${diff}</span>`;
+            function getToParDisplay(toPar) {
+                if (toPar === 0) return '<span class="even-par">E</span>';
+                if (toPar < 0) return `<span class="under-par">${Math.abs(toPar)}</span>`;
+                return `<span class="over-par">${toPar}</span>`;
             }
             
-            function getTotalDiffDisplay(score, par) {
-                if (score === 0) return '-';
-                const diff = score - par;
-                if (diff === 0) return 'E';
-                const cls = diff < 0 ? 'under' : 'over';
-                return `<span class="${cls}">${diff > 0 ? '+' : ''}${diff}</span>`;
-            }
+            // Calculate cumulative to par for front 9
+            const front9Cumulative = front9.map((h, i) => {
+                if (h.score === null || h.score === 0) return '-';
+                let cum = 0;
+                for (let j = 0; j <= i; j++) {
+                    if (front9[j].score > 0) cum += front9[j].score - front9[j].par;
+                }
+                if (cum === 0) return '<span class="even-par">E</span>';
+                if (cum < 0) return `<span class="under-par">${Math.abs(cum)}</span>`;
+                return `<span class="over-par">${cum}</span>`;
+            });
             
-            return `
+            // Calculate cumulative to par for back 9 (continuing from front 9)
+            const back9Cumulative = back9.map((h, i) => {
+                if (h.score === null || h.score === 0) return '-';
+                let cum = 0;
+                for (let j = 0; j < 9; j++) {
+                    if (front9[j].score > 0) cum += front9[j].score - front9[j].par;
+                }
+                for (let j = 0; j <= i; j++) {
+                    if (back9[j].score > 0) cum += back9[j].score - back9[j].par;
+                }
+                if (cum === 0) return '<span class="even-par">E</span>';
+                if (cum < 0) return `<span class="under-par">${Math.abs(cum)}</span>`;
+                return `<span class="over-par">${cum}</span>`;
+            });
+            
+            // Calculate front 9 totals
+            const front9ParTotal = front9.reduce((sum, h) => sum + h.par, 0);
+            const front9ScoreTotal = front9.reduce((sum, h) => sum + (h.score || 0), 0);
+            const front9HasAllScores = front9.every(h => h.score > 0);
+            const front9ToPar = front9ScoreTotal - front9ParTotal;
+            
+            // Calculate back 9 totals
+            const back9ParTotal = back9.reduce((sum, h) => sum + h.par, 0);
+            const back9ScoreTotal = back9.reduce((sum, h) => sum + (h.score || 0), 0);
+            const back9HasAllScores = back9.every(h => h.score > 0);
+            const back9ToPar = back9ScoreTotal - back9ParTotal;
+            
+            // Calculate total
+            const totalPar = front9ParTotal + back9ParTotal;
+            const totalScore = front9ScoreTotal + back9ScoreTotal;
+            const allHolesScored = front9HasAllScores && back9HasAllScores;
+            const totalToPar = totalScore - totalPar;
+            
+            // Front 9 HTML
+            const front = `
                 <tr class="hole-header">
-                    <th>Hole</th>
-                    ${front9.map(h => `<th class="hole-num-cell" onclick="goToHole(${h.hole})" style="cursor:pointer;${getHoleCellStyle(h)}">${h.hole}</th>`).join('')}
-                    <th class="total-col">Out</th>
+                    <th class="label-cell">HOLE</th>
+                    ${front9.map(h => `<th class="hole-num-cell" onclick="goToHole(${h.hole})" style="${getHoleCellStyle(h)}">${h.hole}</th>`).join('')}
+                    <th class="total-cell">OUT</th>
+                    <th class="total-cell"></th>
                 </tr>
                 <tr class="par-row">
-                    <td>Par</td>
+                    <td class="label-cell">PAR</td>
                     ${front9.map(h => `<td>${h.par}</td>`).join('')}
-                    <td class="total-col">${front9Par}</td>
+                    <td class="total-cell">${front9ParTotal}</td>
+                    <td class="total-cell"></td>
                 </tr>
-                <tr>
-                    <td>Score</td>
+                <tr class="score-row">
+                    <td class="label-cell">SCORE</td>
                     ${front9.map(h => `<td class="score-cell">${getScoreDisplay(h)}</td>`).join('')}
-                    <td class="total-col">${front9Score || '-'}</td>
+                    <td class="total-cell">${front9HasAllScores ? front9ScoreTotal : '-'}</td>
+                    <td class="total-cell"></td>
                 </tr>
-                <tr>
-                    <td>+/-</td>
-                    ${front9.map(h => `<td class="diff-cell">${getDiffDisplay(h)}</td>`).join('')}
-                    <td class="total-col diff-cell">${getTotalDiffDisplay(front9PlayedScore, front9PlayedPar)}</td>
-                </tr>
-                <tr><td colspan="11" style="height:8px;border:none;"></td></tr>
-                <tr class="hole-header">
-                    <th>Hole</th>
-                    ${back9.map(h => `<th class="hole-num-cell" onclick="goToHole(${h.hole})" style="cursor:pointer;${getHoleCellStyle(h)}">${h.hole}</th>`).join('')}
-                    <th class="total-col">In</th>
-                </tr>
-                <tr class="par-row">
-                    <td>Par</td>
-                    ${back9.map(h => `<td>${h.par}</td>`).join('')}
-                    <td class="total-col">${back9Par}</td>
-                </tr>
-                <tr>
-                    <td>Score</td>
-                    ${back9.map(h => `<td class="score-cell">${getScoreDisplay(h)}</td>`).join('')}
-                    <td class="total-col">${back9Score || '-'}</td>
-                </tr>
-                <tr>
-                    <td>+/-</td>
-                    ${back9.map(h => `<td class="diff-cell">${getDiffDisplay(h)}</td>`).join('')}
-                    <td class="total-col diff-cell">${getTotalDiffDisplay(back9PlayedScore, back9PlayedPar)}</td>
-                </tr>
-                <tr><td colspan="11" style="height:8px;border:none;"></td></tr>
-                <tr class="hole-header">
-                    <th colspan="10" style="text-align:right;">Total</th>
-                    <th class="total-col">${totalPlayedScore || '-'} <span class="diff-cell">${getTotalDiffDisplay(totalPlayedScore, totalPlayedPar)}</span></th>
+                <tr class="cumulative-row">
+                    <td class="label-cell">${nameLabel}</td>
+                    ${front9Cumulative.map(c => `<td>${c}</td>`).join('')}
+                    <td class="total-cell">${front9HasAllScores ? getToParDisplay(front9ToPar) : '-'}</td>
+                    <td class="total-cell"></td>
                 </tr>
             `;
+            
+            // Back 9 HTML
+            const back = `
+                <tr class="hole-header">
+                    <th class="label-cell">HOLE</th>
+                    ${back9.map(h => `<th class="hole-num-cell" onclick="goToHole(${h.hole})" style="${getHoleCellStyle(h)}">${h.hole}</th>`).join('')}
+                    <th class="total-cell">IN</th>
+                    <th class="total-cell">TOT</th>
+                </tr>
+                <tr class="par-row">
+                    <td class="label-cell">PAR</td>
+                    ${back9.map(h => `<td>${h.par}</td>`).join('')}
+                    <td class="total-cell">${back9ParTotal}</td>
+                    <td class="total-cell">${totalPar}</td>
+                </tr>
+                <tr class="score-row">
+                    <td class="label-cell">SCORE</td>
+                    ${back9.map(h => `<td class="score-cell">${getScoreDisplay(h)}</td>`).join('')}
+                    <td class="total-cell">${back9HasAllScores ? back9ScoreTotal : '-'}</td>
+                    <td class="total-cell">${allHolesScored ? totalScore : '-'}</td>
+                </tr>
+                <tr class="cumulative-row">
+                    <td class="label-cell">${nameLabel}</td>
+                    ${back9Cumulative.map(c => `<td>${c}</td>`).join('')}
+                    <td class="total-cell">${back9HasAllScores ? getToParDisplay(back9ToPar) : '-'}</td>
+                    <td class="total-cell">${allHolesScored ? getToParDisplay(totalToPar) : '-'}</td>
+                </tr>
+            `;
+            
+            return { front, back };
         }
         
-        function generateScorecardTableContent(round, course) {
+        function generateScorecardTableContentSplit(round, course, playerName) {
             const holes = round.holes;
             const front9 = holes.slice(0, 9);
             const back9 = holes.slice(9, 18);
-            
-            const front9Par = front9.reduce((a, h) => a + h.par, 0);
-            const back9Par = back9.reduce((a, h) => a + h.par, 0);
-            const totalPar = front9Par + back9Par;
-            
-            const front9Score = front9.reduce((a, h) => a + (h.score || 0), 0);
-            const back9Score = back9.reduce((a, h) => a + (h.score || 0), 0);
-            const totalScore = front9Score + back9Score;
+            const nameLabel = playerName || 'TO PAR';
             
             function getScoreDisplay(hole) {
-                if (hole.score === null) return '-';
+                if (hole.score === null || hole.score === 0) return '-';
                 const diff = hole.score - hole.par;
                 if (diff <= -2) return `<span class="eagle">${hole.score}</span>`;
                 if (diff === -1) return `<span class="birdie">${hole.score}</span>`;
@@ -2482,130 +3095,180 @@
                 return hole.score;
             }
             
-            function getDiffDisplay(hole) {
-                if (hole.score === null) return '-';
-                const diff = hole.score - hole.par;
-                if (diff === 0) return 'E';
-                const cls = diff < 0 ? 'under' : 'over';
-                return `<span class="${cls}">${diff > 0 ? '+' : ''}${diff}</span>`;
+            function getToParDisplay(toPar) {
+                if (toPar === 0) return '<span class="even-par">E</span>';
+                if (toPar < 0) return `<span class="under-par">${Math.abs(toPar)}</span>`;
+                return `<span class="over-par">${toPar}</span>`;
             }
             
-            return `
+            // Calculate cumulative to par for front 9
+            const front9Cumulative = front9.map((h, i) => {
+                if (h.score === null || h.score === 0) return '-';
+                let cum = 0;
+                for (let j = 0; j <= i; j++) {
+                    if (front9[j].score > 0) cum += front9[j].score - front9[j].par;
+                }
+                if (cum === 0) return '<span class="even-par">E</span>';
+                if (cum < 0) return `<span class="under-par">${Math.abs(cum)}</span>`;
+                return `<span class="over-par">${cum}</span>`;
+            });
+            
+            // Calculate cumulative to par for back 9 (continuing from front 9)
+            const back9Cumulative = back9.map((h, i) => {
+                if (h.score === null || h.score === 0) return '-';
+                let cum = 0;
+                for (let j = 0; j < 9; j++) {
+                    if (front9[j].score > 0) cum += front9[j].score - front9[j].par;
+                }
+                for (let j = 0; j <= i; j++) {
+                    if (back9[j].score > 0) cum += back9[j].score - back9[j].par;
+                }
+                if (cum === 0) return '<span class="even-par">E</span>';
+                if (cum < 0) return `<span class="under-par">${Math.abs(cum)}</span>`;
+                return `<span class="over-par">${cum}</span>`;
+            });
+            
+            // Calculate front 9 totals
+            const front9ParTotal = front9.reduce((sum, h) => sum + h.par, 0);
+            const front9ScoreTotal = front9.reduce((sum, h) => sum + (h.score || 0), 0);
+            const front9HasAllScores = front9.every(h => h.score > 0);
+            const front9ToPar = front9ScoreTotal - front9ParTotal;
+            
+            // Calculate back 9 totals
+            const back9ParTotal = back9.reduce((sum, h) => sum + h.par, 0);
+            const back9ScoreTotal = back9.reduce((sum, h) => sum + (h.score || 0), 0);
+            const back9HasAllScores = back9.every(h => h.score > 0);
+            const back9ToPar = back9ScoreTotal - back9ParTotal;
+            
+            // Calculate total
+            const totalPar = front9ParTotal + back9ParTotal;
+            const totalScore = front9ScoreTotal + back9ScoreTotal;
+            const allHolesScored = front9HasAllScores && back9HasAllScores;
+            const totalToPar = totalScore - totalPar;
+            
+            const front = `
                 <tr class="hole-header">
-                    <th>Hole</th>
+                    <th class="label-cell">HOLE</th>
                     ${front9.map(h => `<th>${h.hole}</th>`).join('')}
-                    <th class="total-col">Out</th>
+                    <th class="total-cell">OUT</th>
+                    <th class="total-cell"></th>
                 </tr>
                 <tr class="par-row">
-                    <td>Par</td>
+                    <td class="label-cell">PAR</td>
                     ${front9.map(h => `<td>${h.par}</td>`).join('')}
-                    <td class="total-col">${front9Par}</td>
+                    <td class="total-cell">${front9ParTotal}</td>
+                    <td class="total-cell"></td>
                 </tr>
-                <tr>
-                    <td>Score</td>
+                <tr class="score-row">
+                    <td class="label-cell">SCORE</td>
                     ${front9.map(h => `<td class="score-cell">${getScoreDisplay(h)}</td>`).join('')}
-                    <td class="total-col">${front9Score}</td>
+                    <td class="total-cell">${front9HasAllScores ? front9ScoreTotal : '-'}</td>
+                    <td class="total-cell"></td>
                 </tr>
-                <tr>
-                    <td>+/-</td>
-                    ${front9.map(h => `<td class="diff-cell">${getDiffDisplay(h)}</td>`).join('')}
-                    <td class="total-col diff-cell ${front9Score - front9Par < 0 ? 'under' : front9Score - front9Par > 0 ? 'over' : ''}">${front9Score - front9Par === 0 ? 'E' : (front9Score - front9Par > 0 ? '+' : '') + (front9Score - front9Par)}</td>
-                </tr>
-                <tr><td colspan="11" style="height:8px;border:none;"></td></tr>
-                <tr class="hole-header">
-                    <th>Hole</th>
-                    ${back9.map(h => `<th>${h.hole}</th>`).join('')}
-                    <th class="total-col">In</th>
-                </tr>
-                <tr class="par-row">
-                    <td>Par</td>
-                    ${back9.map(h => `<td>${h.par}</td>`).join('')}
-                    <td class="total-col">${back9Par}</td>
-                </tr>
-                <tr>
-                    <td>Score</td>
-                    ${back9.map(h => `<td class="score-cell">${getScoreDisplay(h)}</td>`).join('')}
-                    <td class="total-col">${back9Score}</td>
-                </tr>
-                <tr>
-                    <td>+/-</td>
-                    ${back9.map(h => `<td class="diff-cell">${getDiffDisplay(h)}</td>`).join('')}
-                    <td class="total-col diff-cell ${back9Score - back9Par < 0 ? 'under' : back9Score - back9Par > 0 ? 'over' : ''}">${back9Score - back9Par === 0 ? 'E' : (back9Score - back9Par > 0 ? '+' : '') + (back9Score - back9Par)}</td>
-                </tr>
-                <tr><td colspan="11" style="height:8px;border:none;"></td></tr>
-                <tr class="hole-header">
-                    <th colspan="10" style="text-align:right;">Total</th>
-                    <th class="total-col">${totalScore}</th>
+                <tr class="cumulative-row">
+                    <td class="label-cell">${nameLabel}</td>
+                    ${front9Cumulative.map(c => `<td>${c}</td>`).join('')}
+                    <td class="total-cell">${front9HasAllScores ? getToParDisplay(front9ToPar) : '-'}</td>
+                    <td class="total-cell"></td>
                 </tr>
             `;
+            
+            const back = `
+                <tr class="hole-header">
+                    <th class="label-cell">HOLE</th>
+                    ${back9.map(h => `<th>${h.hole}</th>`).join('')}
+                    <th class="total-cell">IN</th>
+                    <th class="total-cell">TOT</th>
+                </tr>
+                <tr class="par-row">
+                    <td class="label-cell">PAR</td>
+                    ${back9.map(h => `<td>${h.par}</td>`).join('')}
+                    <td class="total-cell">${back9ParTotal}</td>
+                    <td class="total-cell">${totalPar}</td>
+                </tr>
+                <tr class="score-row">
+                    <td class="label-cell">SCORE</td>
+                    ${back9.map(h => `<td class="score-cell">${getScoreDisplay(h)}</td>`).join('')}
+                    <td class="total-cell">${back9HasAllScores ? back9ScoreTotal : '-'}</td>
+                    <td class="total-cell">${allHolesScored ? totalScore : '-'}</td>
+                </tr>
+                <tr class="cumulative-row">
+                    <td class="label-cell">${nameLabel}</td>
+                    ${back9Cumulative.map(c => `<td>${c}</td>`).join('')}
+                    <td class="total-cell">${back9HasAllScores ? getToParDisplay(back9ToPar) : '-'}</td>
+                    <td class="total-cell">${allHolesScored ? getToParDisplay(totalToPar) : '-'}</td>
+                </tr>
+            `;
+            
+            return { front, back };
         }
         
         function generateStatsHTML(stats) {
             // Color functions for round summary
             function getColor(value, threshold) {
                 if (value === null) return '';
-                if (value >= threshold) return 'color:var(--good);';
+                if (value >= threshold) return 'color:var(--masters-green);';
                 if (value >= threshold * 0.7) return 'color:var(--medium);';
-                return 'color:var(--bad);';
+                return 'color:var(--masters-red);';
             }
             function getColorInv(value, threshold) {
                 if (value === null) return '';
-                if (value <= threshold) return 'color:var(--good);';
+                if (value <= threshold) return 'color:var(--masters-green);';
                 if (value <= threshold * 1.2) return 'color:var(--medium);';
-                return 'color:var(--bad);';
+                return 'color:var(--masters-red);';
             }
             function getUDColor(value) {
                 if (value === null) return '';
-                if (value >= 68) return 'color:var(--good);';
+                if (value >= 68) return 'color:var(--masters-green);';
                 if (value >= 55) return 'color:var(--medium);';
-                return 'color:var(--bad);';
+                return 'color:var(--masters-red);';
             }
             
             return `
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
-                        <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">Fairways</div>
-                        <div style="font-size:18px;font-weight:500;${getColor(stats.fwPct, 60)}">${stats.fwPct !== null ? stats.fwPct + '%' : '--'}</div>
+                    <div style="background:#ffffff;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
+                        <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Fairways</div>
+                        <div style="font-size:18px;font-weight:600;${getColor(stats.fwPct, 60)}">${stats.fwPct !== null ? stats.fwPct + '%' : '--'}</div>
                         <div style="font-size:11px;color:var(--text-faint);">${stats.fwHit} of ${stats.fwTotal}</div>
                     </div>
-                    <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
-                        <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">GIR</div>
-                        <div style="font-size:18px;font-weight:500;${getColor(stats.girPct, 66)}">${stats.girPct !== null ? stats.girPct + '%' : '--'}</div>
+                    <div style="background:#fafafa;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
+                        <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">GIR</div>
+                        <div style="font-size:18px;font-weight:600;${getColor(stats.girPct, 66)}">${stats.girPct !== null ? stats.girPct + '%' : '--'}</div>
                         <div style="font-size:11px;color:var(--text-faint);">${stats.girHit} of ${stats.girTotal}</div>
                     </div>
-                    <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
-                        <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">Putts</div>
-                        <div style="font-size:18px;font-weight:500;${getColorInv(stats.totalPutts, 29)}">${stats.totalPutts || '--'}</div>
+                    <div style="background:#fafafa;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
+                        <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Putts</div>
+                        <div style="font-size:18px;font-weight:600;${getColorInv(stats.totalPutts, 29)}">${stats.totalPutts || '--'}</div>
                         <div style="font-size:11px;color:var(--text-faint);">${stats.puttsPerHole || '--'}/hole</div>
                     </div>
-                    <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
-                        <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">3-Putts</div>
-                        <div style="font-size:18px;font-weight:500;${stats.threePutts < 1 ? 'color:var(--good);' : stats.threePutts <= 1.5 ? 'color:var(--medium);' : 'color:var(--bad);'}">${stats.threePutts}</div>
+                    <div style="background:#ffffff;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
+                        <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">3-Putts</div>
+                        <div style="font-size:18px;font-weight:600;${stats.threePutts < 1 ? 'color:var(--masters-green);' : stats.threePutts <= 1.5 ? 'color:var(--medium);' : 'color:var(--masters-red);'}">${stats.threePutts}</div>
                         <div style="font-size:11px;color:var(--text-faint);">&nbsp;</div>
                     </div>
-                    <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
-                        <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">Gettable Putts</div>
-                        <div style="font-size:18px;font-weight:500;${getColor(stats.gettablePct, 65)}">${stats.gettablePct !== null ? stats.gettablePct + '%' : '--'}</div>
+                    <div style="background:#ffffff;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
+                        <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Gettable Putts</div>
+                        <div style="font-size:18px;font-weight:600;${getColor(stats.gettablePct, 65)}">${stats.gettablePct !== null ? stats.gettablePct + '%' : '--'}</div>
                         <div style="font-size:11px;color:var(--text-faint);">${stats.gettableMade} of ${stats.gettableTotal}</div>
                     </div>
-                    <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
-                        <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">Up & Down</div>
-                        <div style="font-size:18px;font-weight:500;${getUDColor(stats.udPct)}">${stats.udPct !== null ? stats.udPct + '%' : '--'}</div>
+                    <div style="background:#fafafa;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
+                        <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Up & Down</div>
+                        <div style="font-size:18px;font-weight:600;${getUDColor(stats.udPct)}">${stats.udPct !== null ? stats.udPct + '%' : '--'}</div>
                         <div style="font-size:11px;color:var(--text-faint);">${stats.udMade} of ${stats.udAttempts}</div>
                     </div>
-                    <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
-                        <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">Scrambling</div>
-                        <div style="font-size:18px;font-weight:500;${getColor(stats.scramblePct, 59)}">${stats.scramblePct !== null ? stats.scramblePct + '%' : '--'}</div>
+                    <div style="background:#fafafa;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
+                        <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Scrambling</div>
+                        <div style="font-size:18px;font-weight:600;${getColor(stats.scramblePct, 59)}">${stats.scramblePct !== null ? stats.scramblePct + '%' : '--'}</div>
                         <div style="font-size:11px;color:var(--text-faint);">${stats.scrambleSuccess} of ${stats.scrambleAttempts}</div>
                     </div>
-                    <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
-                        <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">🏖️ Sand Saves</div>
-                        <div style="font-size:18px;font-weight:500;${getColor(stats.sandSavesPct, 50)}">${stats.sandSavesPct !== null ? stats.sandSavesPct + '%' : '--'}</div>
+                    <div style="background:#ffffff;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
+                        <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">🏖️ Sand Saves</div>
+                        <div style="font-size:18px;font-weight:600;${getColor(stats.sandSavesPct, 50)}">${stats.sandSavesPct !== null ? stats.sandSavesPct + '%' : '--'}</div>
                         <div style="font-size:11px;color:var(--text-faint);">${stats.sandSavesMade} of ${stats.sandSavesAttempts}</div>
                     </div>
-                    <div style="background:var(--card-bg);padding:12px;border-radius:10px;">
-                        <div style="font-size:10px;color:var(--text-light);text-transform:uppercase;">🐦 Birdies</div>
-                        <div style="font-size:18px;font-weight:500;${stats.birdies >= 3 ? 'color:var(--good);' : stats.birdies >= 2 ? 'color:var(--medium);' : 'color:var(--bad);'}">${stats.birdies}</div>
+                    <div style="background:#ffffff;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
+                        <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">🐦 Birdies</div>
+                        <div style="font-size:18px;font-weight:600;${stats.birdies >= 3 ? 'color:var(--masters-green);' : stats.birdies >= 2 ? 'color:var(--medium);' : 'color:var(--masters-red);'}">${stats.birdies}</div>
                         <div style="font-size:11px;color:var(--text-faint);">${stats.eagles > 0 ? '+' + stats.eagles + ' eagles 🦅' : ''}</div>
                     </div>
                 </div>
@@ -2667,10 +3330,17 @@
             
             // Progress
             document.getElementById('progressFill').style.width = ((currentHoleIndex + 1) / 18 * 100) + '%';
-            document.getElementById('progressText').textContent = `Hole ${currentHoleIndex + 1} of 18`;
+            const isEditing = editingRoundIndex !== null;
+            document.getElementById('progressText').textContent = isEditing 
+                ? `Editing: Hole ${currentHoleIndex + 1} of 18` 
+                : `Hole ${currentHoleIndex + 1} of 18`;
             
             // Next button text
-            document.getElementById('nextHoleBtn').textContent = currentHoleIndex === 17 ? 'Finish →' : 'Next →';
+            document.getElementById('nextHoleBtn').textContent = currentHoleIndex === 17 ? (isEditing ? 'Save →' : 'Finish →') : 'Next →';
+            
+            // Update finish/abandon button labels for editing mode
+            document.querySelector('#playActive > button.btn-secondary[onclick="finishRound()"]').textContent = isEditing ? 'Save Changes' : 'Finish Round';
+            document.querySelector('#playActive > button.btn-danger[onclick="abandonRound()"]').textContent = isEditing ? 'Discard Changes' : 'Abandon Round';
             
             // Update scorecard if visible
             if (scorecardVisible) renderScorecard();
@@ -2836,7 +3506,6 @@
                 const issues = [];
                 if (h.score === 0 || h.score === null) issues.push('score');
                 if (h.par >= 4 && h.fairway === null) issues.push('fairway');
-                if (h.putts === null || h.putts === 0 && h.score > 0) issues.push('putts');
                 if (h.upDownAttempt === true && h.upDownMade === null) issues.push('up&down made');
                 if (issues.length > 0) {
                     incompleteHoles.push({ hole: idx + 1, issues });
@@ -2851,14 +3520,25 @@
                 return;
             }
             
-            if (!confirm('Finish and save this round?')) return;
+            const isEditing = editingRoundIndex !== null;
+            if (!confirm(isEditing ? 'Save changes to this round?' : 'Finish and save this round?')) return;
             
             let total = 0;
             state.currentRound.holes.forEach(h => total += h.score);
             state.currentRound.totalScore = total;
             
             const finishedRound = { ...state.currentRound };
-            state.rounds.push(finishedRound);
+            
+            if (isEditing) {
+                // Update existing round
+                state.rounds[editingRoundIndex] = finishedRound;
+                editingRoundIndex = null;
+                state.editingRoundIndex = null;
+            } else {
+                // Add new round
+                state.rounds.push(finishedRound);
+            }
+            
             state.currentRound = null;
             finishAttempted = false;
             
@@ -2891,17 +3571,28 @@
         }
         
         function abandonRound() {
-            if (!confirm('Are you sure you want to abandon this round? All data will be deleted.')) return;
+            const isEditing = editingRoundIndex !== null;
+            const message = isEditing 
+                ? 'Are you sure you want to discard your changes? The original round will be kept.'
+                : 'Are you sure you want to abandon this round? All data will be deleted.';
+            
+            if (!confirm(message)) return;
             
             state.currentRound = null;
             finishAttempted = false;
+            editingRoundIndex = null;
+            state.editingRoundIndex = null;
             saveState();
             
             document.getElementById('courseSelect').value = '';
             document.getElementById('startRoundBtn').disabled = true;
             
-            // Go back to home tab
-            showTab('homeTab');
+            // Go back to appropriate tab
+            if (isEditing) {
+                showTab('historyTab');
+            } else {
+                showTab('homeTab');
+            }
         }
         
         function showRoundSummary(round) {
@@ -2915,7 +3606,10 @@
             document.getElementById('summaryToPar').textContent = toParStr;
             document.getElementById('summaryCourse').textContent = `${round.courseName} · ${d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}`;
             
-            document.getElementById('summaryScorecard').innerHTML = generateScorecardTableContent(round, course);
+            const playerName = getPlayerLastName();
+            const scorecardContent = generateScorecardTableContentSplit(round, course, playerName);
+            document.getElementById('summaryScorecardFront').innerHTML = scorecardContent.front;
+            document.getElementById('summaryScorecardBack').innerHTML = scorecardContent.back;
             
             const stats = calculateRoundStats(round);
             document.getElementById('summaryStats').innerHTML = generateStatsHTML(stats);
