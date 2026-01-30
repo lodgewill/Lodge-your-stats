@@ -3737,11 +3737,12 @@
         let swipeDirection = null;
         const SWIPE_THRESHOLD = 80;
         
-        function getPreviewContent(holeIndex) {
+        function generateHoleContentHTML(holeIndex) {
             if (!state.currentRound || holeIndex < 0 || holeIndex > 17) return '';
             const hole = state.currentRound.holes[holeIndex];
             const score = hole.score || hole.par;
             const diff = score - hole.par;
+            
             let scoreLabel = 'Par', labelClass = '';
             if (score === 0 || score === hole.par) { scoreLabel = 'Par'; }
             else if (diff <= -2) { scoreLabel = 'Eagle!'; labelClass = 'eagle'; }
@@ -3749,22 +3750,91 @@
             else if (diff === 1) { scoreLabel = 'Bogey'; labelClass = 'bogey'; }
             else if (diff >= 2) { scoreLabel = 'Double'; labelClass = 'double-bogey'; }
             
+            const showFairway = hole.par >= 4;
+            const fairwayYesClass = hole.fairway === true ? 'selected-yes' : '';
+            const fairwayNoClass = hole.fairway === false ? 'selected-no' : '';
+            
+            const upDownAttemptClass = hole.upDownAttempt === true ? 'selected-yes' : '';
+            const upDownDetailsShow = hole.upDownAttempt === true ? 'show' : '';
+            const upDownMadeYesClass = hole.upDownMade === true ? 'selected-yes' : '';
+            const upDownMadeNoClass = hole.upDownMade === false ? 'selected-no' : '';
+            const fromBunkerClass = hole.fromBunker === true ? 'selected-yes' : '';
+            
             return `
                 <div class="scoring-header">
                     <div class="hole-label">Hole</div>
                     <div class="hole-number">${hole.hole}</div>
                     <div class="hole-par">Par ${hole.par}</div>
                 </div>
+                
                 <div class="score-input">
-                    <button class="score-btn" style="opacity:0.5;">−</button>
+                    <button class="score-btn" onclick="adjustScore(-1)">−</button>
                     <div class="score-current">
                         <div class="score-current-num">${score}</div>
                         <div class="score-current-label ${labelClass}">${scoreLabel}</div>
                     </div>
-                    <button class="score-btn" style="opacity:0.5;">+</button>
+                    <button class="score-btn" onclick="adjustScore(1)">+</button>
                 </div>
-                <div style="text-align:center;padding:40px 20px;color:var(--text-lighter);font-size:14px;">
-                    ${hole.score > 0 ? '✓ Scored' : 'Swipe to view'}
+                
+                <div class="stat-card" style="${showFairway ? '' : 'display:none;'}">
+                    <div class="stat-card-title">Fairway Hit?</div>
+                    <div class="yes-no-row">
+                        <button class="yes-no-btn ${fairwayYesClass}" onclick="setFairway(true)">Yes</button>
+                        <button class="yes-no-btn ${fairwayNoClass}" onclick="setFairway(false)">No</button>
+                    </div>
+                </div>
+                
+                <div class="putting-row">
+                    <div class="stat-card putting-card-small" style="display:flex;flex-direction:column;">
+                        <div class="stat-card-title">Putts</div>
+                        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+                            <div class="counter-controls">
+                                <button class="counter-btn" onclick="adjustPutts(-1)">−</button>
+                                <span class="counter-value">${hole.putts || 0}</span>
+                                <button class="counter-btn" onclick="adjustPutts(1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card putting-card-large">
+                        <div class="stat-card-title">Gettable Putts <span class="stat-card-subtitle">(4-12ft)</span></div>
+                        <div class="counter-row">
+                            <span class="counter-label">Made</span>
+                            <div class="counter-controls">
+                                <button class="counter-btn" onclick="adjustGettableMade(-1)">−</button>
+                                <span class="counter-value">${hole.gettableMade || 0}</span>
+                                <button class="counter-btn" onclick="adjustGettableMade(1)">+</button>
+                            </div>
+                        </div>
+                        <div class="counter-row">
+                            <span class="counter-label">Total attempts</span>
+                            <div class="counter-controls">
+                                <button class="counter-btn" onclick="adjustGettableTotal(-1)">−</button>
+                                <span class="counter-value">${hole.gettableTotal || 0}</span>
+                                <button class="counter-btn" onclick="adjustGettableTotal(1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-title">Up & Down <span class="stat-card-subtitle">(&lt;15m from green)</span></div>
+                    <div class="sub-option">
+                        <div class="sub-option-label">Up & Down attempt?</div>
+                        <button class="yes-no-btn single ${upDownAttemptClass}" onclick="toggleUpDownAttempt()">Yes</button>
+                    </div>
+                    <div class="conditional-section ${upDownDetailsShow}">
+                        <div class="sub-option">
+                            <div class="sub-option-label">Up & Down made?</div>
+                            <div class="yes-no-row">
+                                <button class="yes-no-btn ${upDownMadeYesClass}" onclick="setUpDownMade(true)">Yes</button>
+                                <button class="yes-no-btn ${upDownMadeNoClass}" onclick="setUpDownMade(false)">No</button>
+                            </div>
+                        </div>
+                        <div class="sub-option">
+                            <div class="sub-option-label">From bunker?</div>
+                            <button class="yes-no-btn single ${fromBunkerClass}" onclick="setFromBunker()">Yes</button>
+                        </div>
+                    </div>
                 </div>
             `;
         }
@@ -3792,17 +3862,16 @@
                 touchCurrentX = e.touches[0].clientX;
                 const deltaX = touchCurrentX - touchStartX;
                 
-                // Determine swipe direction
+                // Determine swipe direction and setup full preview content
                 if (Math.abs(deltaX) > 10 && swipeDirection === null) {
                     swipeDirection = deltaX > 0 ? 'right' : 'left';
                     
-                    // Setup preview content
                     const preview = document.getElementById('holePreview');
                     if (swipeDirection === 'left' && currentHoleIndex < 17) {
-                        preview.innerHTML = getPreviewContent(currentHoleIndex + 1);
+                        preview.innerHTML = generateHoleContentHTML(currentHoleIndex + 1);
                         preview.className = 'hole-content-preview next dragging';
                     } else if (swipeDirection === 'right' && currentHoleIndex > 0) {
-                        preview.innerHTML = getPreviewContent(currentHoleIndex - 1);
+                        preview.innerHTML = generateHoleContentHTML(currentHoleIndex - 1);
                         preview.className = 'hole-content-preview prev dragging';
                     }
                 }
@@ -3811,20 +3880,14 @@
                 let adjustedDelta = deltaX;
                 if ((swipeDirection === 'left' && currentHoleIndex >= 17) ||
                     (swipeDirection === 'right' && currentHoleIndex <= 0)) {
-                    adjustedDelta = deltaX * 0.2; // Resistance effect
+                    adjustedDelta = deltaX * 0.2;
                 }
                 
-                // Move current content and preview
                 const holeContent = document.getElementById('holeContent');
                 const preview = document.getElementById('holePreview');
                 
                 holeContent.style.transform = `translateX(${adjustedDelta}px)`;
-                
-                if (swipeDirection === 'left') {
-                    preview.style.transform = `translateX(${adjustedDelta}px)`;
-                } else if (swipeDirection === 'right') {
-                    preview.style.transform = `translateX(${adjustedDelta}px)`;
-                }
+                preview.style.transform = `translateX(${adjustedDelta}px)`;
             }, { passive: true });
             
             swipeContainer.addEventListener('touchend', (e) => {
@@ -3839,11 +3902,10 @@
                 holeContent.classList.remove('dragging');
                 preview.classList.remove('dragging');
                 
-                // Determine if swipe should complete
                 const shouldComplete = Math.abs(deltaX) > SWIPE_THRESHOLD;
                 
                 if (shouldComplete && swipeDirection === 'left' && currentHoleIndex < 17) {
-                    // Complete swipe to next hole - animate to final position
+                    // Animate to final position
                     holeContent.style.transform = `translateX(-${containerWidth}px)`;
                     preview.style.transform = `translateX(-${containerWidth}px)`;
                     
@@ -3854,61 +3916,73 @@
                             pendingCelebration = null;
                         }
                         
-                        // Update state
+                        // Update index
                         currentHoleIndex++;
+                        
+                        // Copy preview content to main (no re-render needed!)
+                        holeContent.innerHTML = preview.innerHTML;
+                        
+                        // Reset positions instantly (no transition)
+                        holeContent.classList.add('dragging');
+                        preview.classList.add('dragging');
+                        holeContent.style.transform = '';
+                        preview.style.transform = '';
+                        preview.innerHTML = '';
+                        preview.className = 'hole-content-preview';
+                        
+                        // Re-enable transitions
+                        requestAnimationFrame(() => {
+                            holeContent.classList.remove('dragging');
+                            preview.classList.remove('dragging');
+                        });
+                        
+                        // Update other UI elements (progress bar, scorecard, etc)
+                        updateProgressBar();
+                        updateScorecard();
+                        
                         if (scorecardVisible) {
                             scorecardVisible = false;
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
-                        
-                        // Hide main content, rebuild it off-screen, then swap
-                        holeContent.style.visibility = 'hidden';
-                        holeContent.classList.add('dragging');
-                        holeContent.style.transform = '';
-                        
-                        renderCurrentHole();
-                        
-                        // Swap: show main content, hide preview
-                        requestAnimationFrame(() => {
-                            holeContent.style.visibility = '';
-                            holeContent.classList.remove('dragging');
-                            preview.innerHTML = '';
-                            preview.className = 'hole-content-preview';
-                            preview.style.transform = '';
-                        });
                     }, 250);
                     
                 } else if (shouldComplete && swipeDirection === 'right' && currentHoleIndex > 0) {
-                    // Complete swipe to previous hole
+                    // Animate to final position
                     holeContent.style.transform = `translateX(${containerWidth}px)`;
                     preview.style.transform = `translateX(${containerWidth}px)`;
                     
                     setTimeout(() => {
-                        // Update state
+                        // Update index
                         currentHoleIndex--;
                         pendingCelebration = null;
+                        
+                        // Copy preview content to main (no re-render needed!)
+                        holeContent.innerHTML = preview.innerHTML;
+                        
+                        // Reset positions instantly (no transition)
+                        holeContent.classList.add('dragging');
+                        preview.classList.add('dragging');
+                        holeContent.style.transform = '';
+                        preview.style.transform = '';
+                        preview.innerHTML = '';
+                        preview.className = 'hole-content-preview';
+                        
+                        // Re-enable transitions
+                        requestAnimationFrame(() => {
+                            holeContent.classList.remove('dragging');
+                            preview.classList.remove('dragging');
+                        });
+                        
+                        // Update other UI elements
+                        updateProgressBar();
+                        updateScorecard();
+                        
                         if (scorecardVisible) {
                             scorecardVisible = false;
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
-                        
-                        // Hide main content, rebuild it off-screen, then swap
-                        holeContent.style.visibility = 'hidden';
-                        holeContent.classList.add('dragging');
-                        holeContent.style.transform = '';
-                        
-                        renderCurrentHole();
-                        
-                        // Swap: show main content, hide preview
-                        requestAnimationFrame(() => {
-                            holeContent.style.visibility = '';
-                            holeContent.classList.remove('dragging');
-                            preview.innerHTML = '';
-                            preview.className = 'hole-content-preview';
-                            preview.style.transform = '';
-                        });
                     }, 250);
                     
                 } else {
@@ -3923,6 +3997,33 @@
                 
                 swipeDirection = null;
             }, { passive: true });
+        }
+        
+        function updateProgressBar() {
+            const progress = ((currentHoleIndex + 1) / 18) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            const isEditing = editingRoundIndex !== null;
+            document.getElementById('progressText').textContent = isEditing 
+                ? `Editing: Hole ${currentHoleIndex + 1} of 18`
+                : `Hole ${currentHoleIndex + 1} of 18`;
+            
+            // Update live score
+            let totalToPar = 0;
+            state.currentRound.holes.forEach(h => {
+                if (h.score > 0) totalToPar += h.score - h.par;
+            });
+            const liveScoreEl = document.getElementById('liveScore');
+            if (totalToPar === 0) liveScoreEl.textContent = 'E';
+            else if (totalToPar > 0) liveScoreEl.textContent = '+' + totalToPar;
+            else liveScoreEl.textContent = totalToPar;
+        }
+        
+        function updateScorecard() {
+            const course = state.courses.find(c => c.id === state.currentRound.courseId);
+            const scorecardContent = generatePlayScorecardContent(state.currentRound, course, state.profile.name || null);
+            document.getElementById('classicScorecardFront').innerHTML = scorecardContent.front;
+            document.getElementById('classicScorecardBack').innerHTML = scorecardContent.back;
         }
         
         // ==================== INIT ====================
