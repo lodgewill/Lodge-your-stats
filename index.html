@@ -1286,6 +1286,7 @@
             position: relative;
             transition: transform 0.25s ease-out;
             will-change: transform;
+            z-index: 1;
         }
         .hole-content.dragging {
             transition: none;
@@ -1293,21 +1294,22 @@
         .hole-content-preview {
             position: absolute;
             top: 0;
+            left: 0;
             width: 100%;
-            pointer-events: none;
             transition: transform 0.25s ease-out;
             will-change: transform;
             background: var(--bg);
+            pointer-events: auto;
+            z-index: 2;
         }
         .hole-content-preview.dragging {
             transition: none;
         }
         .hole-content-preview.next {
-            left: 100%;
+            transform: translateX(100%);
         }
         .hole-content-preview.prev {
-            right: 100%;
-            left: auto;
+            transform: translateX(-100%);
         }
         
         /* Hole Grid */
@@ -3735,6 +3737,7 @@
         let touchCurrentX = 0;
         let isDragging = false;
         let swipeDirection = null;
+        let swipeAnimating = false;
         const SWIPE_THRESHOLD = 80;
         
         function generateHoleContentHTML(holeIndex) {
@@ -3839,12 +3842,40 @@
             `;
         }
         
+        // Sync the visual state with current hole index - called before any interaction
+        function syncHoleContent() {
+            const holeContent = document.getElementById('holeContent');
+            const preview = document.getElementById('holePreview');
+            
+            // Instant update - no transitions
+            holeContent.style.transition = 'none';
+            preview.style.transition = 'none';
+            
+            holeContent.innerHTML = generateHoleContentHTML(currentHoleIndex);
+            holeContent.style.transform = '';
+            
+            preview.innerHTML = '';
+            preview.style.transform = '';
+            preview.classList.remove('next', 'prev');
+            
+            void holeContent.offsetHeight;
+            
+            requestAnimationFrame(() => {
+                holeContent.style.transition = '';
+                preview.style.transition = '';
+            });
+        }
+        
         function setupSwipeListeners() {
             const swipeContainer = document.getElementById('holeSwipeContainer');
             if (!swipeContainer) return;
             
             swipeContainer.addEventListener('touchstart', (e) => {
-                if (!state.currentRound) return;
+                if (!state.currentRound || swipeAnimating) return;
+                
+                // Always sync first to ensure we're in a clean state
+                syncHoleContent();
+                
                 touchStartX = e.touches[0].clientX;
                 touchCurrentX = touchStartX;
                 isDragging = true;
@@ -3857,22 +3888,24 @@
             }, { passive: true });
             
             swipeContainer.addEventListener('touchmove', (e) => {
-                if (!isDragging || !state.currentRound) return;
+                if (!isDragging || !state.currentRound || swipeAnimating) return;
                 
                 touchCurrentX = e.touches[0].clientX;
                 const deltaX = touchCurrentX - touchStartX;
                 
-                // Determine swipe direction and setup full preview content
+                // Determine swipe direction and setup preview
                 if (Math.abs(deltaX) > 10 && swipeDirection === null) {
                     swipeDirection = deltaX > 0 ? 'right' : 'left';
                     
                     const preview = document.getElementById('holePreview');
                     if (swipeDirection === 'left' && currentHoleIndex < 17) {
                         preview.innerHTML = generateHoleContentHTML(currentHoleIndex + 1);
-                        preview.className = 'hole-content-preview next dragging';
+                        preview.classList.add('next');
+                        preview.classList.remove('prev');
                     } else if (swipeDirection === 'right' && currentHoleIndex > 0) {
                         preview.innerHTML = generateHoleContentHTML(currentHoleIndex - 1);
-                        preview.className = 'hole-content-preview prev dragging';
+                        preview.classList.add('prev');
+                        preview.classList.remove('next');
                     }
                 }
                 
@@ -3886,18 +3919,24 @@
                 const holeContent = document.getElementById('holeContent');
                 const preview = document.getElementById('holePreview');
                 
+                // Move current content
                 holeContent.style.transform = `translateX(${adjustedDelta}px)`;
-                preview.style.transform = `translateX(${adjustedDelta}px)`;
+                
+                // Move preview (it starts at 100% or -100%, so we add the delta)
+                if (swipeDirection === 'left') {
+                    preview.style.transform = `translateX(calc(100% + ${adjustedDelta}px))`;
+                } else if (swipeDirection === 'right') {
+                    preview.style.transform = `translateX(calc(-100% + ${adjustedDelta}px))`;
+                }
             }, { passive: true });
             
             swipeContainer.addEventListener('touchend', (e) => {
-                if (!isDragging || !state.currentRound) return;
+                if (!isDragging || !state.currentRound || swipeAnimating) return;
                 isDragging = false;
                 
                 const holeContent = document.getElementById('holeContent');
                 const preview = document.getElementById('holePreview');
                 const deltaX = touchCurrentX - touchStartX;
-                const containerWidth = swipeContainer.offsetWidth;
                 
                 holeContent.classList.remove('dragging');
                 preview.classList.remove('dragging');
@@ -3905,45 +3944,20 @@
                 const shouldComplete = Math.abs(deltaX) > SWIPE_THRESHOLD;
                 
                 if (shouldComplete && swipeDirection === 'left' && currentHoleIndex < 17) {
-                    // Animate to final position
-                    holeContent.style.transform = `translateX(-${containerWidth}px)`;
-                    preview.style.transform = `translateX(-${containerWidth}px)`;
+                    swipeAnimating = true;
                     
+                    // Animate to final: holeContent goes left, preview comes to center
+                    holeContent.style.transform = `translateX(-100%)`;
+                    preview.style.transform = `translateX(0)`;
+                    
+                    // After animation - just update state, no visual changes needed
                     setTimeout(() => {
-                        // Trigger celebration if pending
                         if (pendingCelebration) {
                             showCelebration(pendingCelebration);
                             pendingCelebration = null;
                         }
                         
-                        // Update index
                         currentHoleIndex++;
-                        
-                        // Prepare holeContent behind the scenes (hidden)
-                        holeContent.style.visibility = 'hidden';
-                        holeContent.style.transition = 'none';
-                        holeContent.innerHTML = preview.innerHTML;
-                        holeContent.style.transform = '';
-                        
-                        // Force reflow
-                        holeContent.offsetHeight;
-                        
-                        // Instant swap - hide preview, show holeContent
-                        // Both at center with same content = no visual change
-                        preview.style.visibility = 'hidden';
-                        holeContent.style.visibility = '';
-                        
-                        // Clean up in next frame
-                        requestAnimationFrame(() => {
-                            holeContent.style.transition = '';
-                            preview.innerHTML = '';
-                            preview.className = 'hole-content-preview';
-                            preview.style.visibility = '';
-                            preview.style.transform = '';
-                            preview.style.transition = '';
-                        });
-                        
-                        // Update other UI elements
                         updateProgressBar();
                         updateScorecard();
                         
@@ -3952,42 +3966,19 @@
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
+                        
+                        swipeAnimating = false;
                     }, 250);
                     
                 } else if (shouldComplete && swipeDirection === 'right' && currentHoleIndex > 0) {
-                    // Animate to final position
-                    holeContent.style.transform = `translateX(${containerWidth}px)`;
-                    preview.style.transform = `translateX(${containerWidth}px)`;
+                    swipeAnimating = true;
+                    
+                    holeContent.style.transform = `translateX(100%)`;
+                    preview.style.transform = `translateX(0)`;
                     
                     setTimeout(() => {
-                        // Update index
                         currentHoleIndex--;
                         pendingCelebration = null;
-                        
-                        // Prepare holeContent behind the scenes (hidden)
-                        holeContent.style.visibility = 'hidden';
-                        holeContent.style.transition = 'none';
-                        holeContent.innerHTML = preview.innerHTML;
-                        holeContent.style.transform = '';
-                        
-                        // Force reflow
-                        holeContent.offsetHeight;
-                        
-                        // Instant swap - hide preview, show holeContent
-                        preview.style.visibility = 'hidden';
-                        holeContent.style.visibility = '';
-                        
-                        // Clean up in next frame
-                        requestAnimationFrame(() => {
-                            holeContent.style.transition = '';
-                            preview.innerHTML = '';
-                            preview.className = 'hole-content-preview';
-                            preview.style.visibility = '';
-                            preview.style.transform = '';
-                            preview.style.transition = '';
-                        });
-                        
-                        // Update other UI elements
                         updateProgressBar();
                         updateScorecard();
                         
@@ -3996,7 +3987,28 @@
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
+                        
+                        swipeAnimating = false;
                     }, 250);
+                    
+                } else {
+                    // Snap back
+                    holeContent.style.transform = '';
+                    if (swipeDirection === 'left') {
+                        preview.style.transform = 'translateX(100%)';
+                    } else if (swipeDirection === 'right') {
+                        preview.style.transform = 'translateX(-100%)';
+                    }
+                    setTimeout(() => {
+                        preview.innerHTML = '';
+                        preview.classList.remove('next', 'prev');
+                        preview.style.transform = '';
+                    }, 250);
+                }
+                
+                swipeDirection = null;
+            }, { passive: true });
+        }
                     
                 } else {
                     // Snap back
