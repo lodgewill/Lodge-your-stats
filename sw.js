@@ -1,4 +1,4 @@
-const CACHE_NAME = 'golf-stats-v14';
+const CACHE_NAME = 'golf-stats-v15';
 const urlsToCache = [
   './',
   './index.html',
