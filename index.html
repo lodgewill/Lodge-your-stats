@@ -1277,6 +1277,39 @@
         }
         .play-nav .btn { flex: 1; margin: 0; }
         
+        /* Hole Content Slide Animation */
+        .hole-content {
+            overflow: hidden;
+        }
+        .hole-content.slide-out-left {
+            animation: slideOutLeft 0.15s ease-out forwards;
+        }
+        .hole-content.slide-in-right {
+            animation: slideInRight 0.15s ease-out forwards;
+        }
+        .hole-content.slide-out-right {
+            animation: slideOutRight 0.15s ease-out forwards;
+        }
+        .hole-content.slide-in-left {
+            animation: slideInLeft 0.15s ease-out forwards;
+        }
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-30px); opacity: 0; }
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(30px); opacity: 0; }
+        }
+        @keyframes slideInLeft {
+            from { transform: translateX(-30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
         /* Hole Grid */
         .hole-grid {
             display: none;
@@ -1718,83 +1751,86 @@
                 </div>
             </div>
             
-            <!-- Hole Info -->
-            <div class="scoring-header">
-                <div class="hole-label">Hole</div>
-                <div class="hole-number" id="currentHoleNum">1</div>
-                <div class="hole-par" id="currentHolePar">Par 4</div>
-            </div>
-            
-            <!-- Score Input -->
-            <div class="score-input">
-                <button class="score-btn" onclick="adjustScore(-1)">−</button>
-                <div class="score-current">
-                    <div class="score-current-num" id="currentScore">4</div>
-                    <div class="score-current-label" id="currentScoreLabel">Par</div>
+            <!-- Hole Content (animated on swipe) -->
+            <div class="hole-content" id="holeContent">
+                <!-- Hole Info -->
+                <div class="scoring-header">
+                    <div class="hole-label">Hole</div>
+                    <div class="hole-number" id="currentHoleNum">1</div>
+                    <div class="hole-par" id="currentHolePar">Par 4</div>
                 </div>
-                <button class="score-btn" onclick="adjustScore(1)">+</button>
-            </div>
-            
-            <!-- Fairway Hit (Par 4 and 5 only) -->
-            <div class="stat-card" id="fairwayCard">
-                <div class="stat-card-title">Fairway Hit?</div>
-                <div class="yes-no-row">
-                    <button class="yes-no-btn" id="fairwayYes" onclick="setFairway(true)">Yes</button>
-                    <button class="yes-no-btn" id="fairwayNo" onclick="setFairway(false)">No</button>
+                
+                <!-- Score Input -->
+                <div class="score-input">
+                    <button class="score-btn" onclick="adjustScore(-1)">−</button>
+                    <div class="score-current">
+                        <div class="score-current-num" id="currentScore">4</div>
+                        <div class="score-current-label" id="currentScoreLabel">Par</div>
+                    </div>
+                    <button class="score-btn" onclick="adjustScore(1)">+</button>
                 </div>
-            </div>
-            
-            <!-- Putts and Gettable Putts side by side -->
-            <div class="putting-row">
-                <div class="stat-card putting-card-small" style="display:flex;flex-direction:column;">
-                    <div class="stat-card-title">Putts</div>
-                    <div style="flex:1;display:flex;align-items:center;justify-content:center;">
-                        <div class="counter-controls">
-                            <button class="counter-btn" onclick="adjustPutts(-1)">−</button>
-                            <span class="counter-value" id="puttsValue">0</span>
-                            <button class="counter-btn" onclick="adjustPutts(1)">+</button>
+                
+                <!-- Fairway Hit (Par 4 and 5 only) -->
+                <div class="stat-card" id="fairwayCard">
+                    <div class="stat-card-title">Fairway Hit?</div>
+                    <div class="yes-no-row">
+                        <button class="yes-no-btn" id="fairwayYes" onclick="setFairway(true)">Yes</button>
+                        <button class="yes-no-btn" id="fairwayNo" onclick="setFairway(false)">No</button>
+                    </div>
+                </div>
+                
+                <!-- Putts and Gettable Putts side by side -->
+                <div class="putting-row">
+                    <div class="stat-card putting-card-small" style="display:flex;flex-direction:column;">
+                        <div class="stat-card-title">Putts</div>
+                        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+                            <div class="counter-controls">
+                                <button class="counter-btn" onclick="adjustPutts(-1)">−</button>
+                                <span class="counter-value" id="puttsValue">0</span>
+                                <button class="counter-btn" onclick="adjustPutts(1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card putting-card-large">
+                        <div class="stat-card-title">Gettable Putts <span class="stat-card-subtitle">(4-12ft)</span></div>
+                        <div class="counter-row">
+                            <span class="counter-label">Made</span>
+                            <div class="counter-controls">
+                                <button class="counter-btn" onclick="adjustGettableMade(-1)">−</button>
+                                <span class="counter-value" id="gettableMadeValue">0</span>
+                                <button class="counter-btn" onclick="adjustGettableMade(1)">+</button>
+                            </div>
+                        </div>
+                        <div class="counter-row">
+                            <span class="counter-label">Total attempts</span>
+                            <div class="counter-controls">
+                                <button class="counter-btn" onclick="adjustGettableTotal(-1)">−</button>
+                                <span class="counter-value" id="gettableTotalValue">0</span>
+                                <button class="counter-btn" onclick="adjustGettableTotal(1)">+</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="stat-card putting-card-large">
-                    <div class="stat-card-title">Gettable Putts <span class="stat-card-subtitle">(4-12ft)</span></div>
-                    <div class="counter-row">
-                        <span class="counter-label">Made</span>
-                        <div class="counter-controls">
-                            <button class="counter-btn" onclick="adjustGettableMade(-1)">−</button>
-                            <span class="counter-value" id="gettableMadeValue">0</span>
-                            <button class="counter-btn" onclick="adjustGettableMade(1)">+</button>
-                        </div>
-                    </div>
-                    <div class="counter-row">
-                        <span class="counter-label">Total attempts</span>
-                        <div class="counter-controls">
-                            <button class="counter-btn" onclick="adjustGettableTotal(-1)">−</button>
-                            <span class="counter-value" id="gettableTotalValue">0</span>
-                            <button class="counter-btn" onclick="adjustGettableTotal(1)">+</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Up & Down -->
-            <div class="stat-card">
-                <div class="stat-card-title">Up & Down <span class="stat-card-subtitle">(&lt;15m from green)</span></div>
-                <div class="sub-option">
-                    <div class="sub-option-label">Up & Down attempt?</div>
-                    <button class="yes-no-btn single" id="upDownAttemptYes" onclick="toggleUpDownAttempt()">Yes</button>
-                </div>
-                <div class="conditional-section" id="upDownDetails">
+                
+                <!-- Up & Down -->
+                <div class="stat-card">
+                    <div class="stat-card-title">Up & Down <span class="stat-card-subtitle">(&lt;15m from green)</span></div>
                     <div class="sub-option">
-                        <div class="sub-option-label">Up & Down made? <span id="upDownMadeWarning" style="color:var(--bad);display:none;"> ⚠</span></div>
-                        <div class="yes-no-row">
-                            <button class="yes-no-btn" id="upDownMadeYes" onclick="setUpDownMade(true)">Yes</button>
-                            <button class="yes-no-btn" id="upDownMadeNo" onclick="setUpDownMade(false)">No</button>
-                        </div>
+                        <div class="sub-option-label">Up & Down attempt?</div>
+                        <button class="yes-no-btn single" id="upDownAttemptYes" onclick="toggleUpDownAttempt()">Yes</button>
                     </div>
-                    <div class="sub-option">
-                        <div class="sub-option-label">From bunker?</div>
-                        <button class="yes-no-btn single" id="fromBunkerBtn" onclick="setFromBunker()">Yes</button>
+                    <div class="conditional-section" id="upDownDetails">
+                        <div class="sub-option">
+                            <div class="sub-option-label">Up & Down made? <span id="upDownMadeWarning" style="color:var(--bad);display:none;"> ⚠</span></div>
+                            <div class="yes-no-row">
+                                <button class="yes-no-btn" id="upDownMadeYes" onclick="setUpDownMade(true)">Yes</button>
+                                <button class="yes-no-btn" id="upDownMadeNo" onclick="setUpDownMade(false)">No</button>
+                            </div>
+                        </div>
+                        <div class="sub-option">
+                            <div class="sub-option-label">From bunker?</div>
+                            <button class="yes-no-btn single" id="fromBunkerBtn" onclick="setFromBunker()">Yes</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2919,10 +2955,30 @@
         }
         
         function goToHole(holeNum) {
-            currentHoleIndex = holeNum - 1;
-            pendingCelebration = null;
-            renderCurrentHole();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const targetIndex = holeNum - 1;
+            if (targetIndex === currentHoleIndex) return;
+            
+            const holeContent = document.getElementById('holeContent');
+            const goingForward = targetIndex > currentHoleIndex;
+            
+            // Slide out
+            holeContent.classList.add(goingForward ? 'slide-out-left' : 'slide-out-right');
+            
+            setTimeout(() => {
+                currentHoleIndex = targetIndex;
+                pendingCelebration = null;
+                renderCurrentHole();
+                
+                // Slide in
+                holeContent.classList.remove('slide-out-left', 'slide-out-right');
+                holeContent.classList.add(goingForward ? 'slide-in-right' : 'slide-in-left');
+                
+                setTimeout(() => {
+                    holeContent.classList.remove('slide-in-right', 'slide-in-left');
+                }, 150);
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 150);
         }
         
         function generateScorecardHTML(round, course, playerName) {
@@ -3472,16 +3528,32 @@
         
         function prevHole() {
             if (currentHoleIndex > 0) {
-                currentHoleIndex--;
-                pendingCelebration = null;
-                // Hide scorecard
-                if (scorecardVisible) {
-                    scorecardVisible = false;
-                    document.getElementById('scorecardContainer').classList.remove('show');
-                    document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
-                }
-                renderCurrentHole();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                const holeContent = document.getElementById('holeContent');
+                
+                // Slide out to right
+                holeContent.classList.add('slide-out-right');
+                
+                setTimeout(() => {
+                    currentHoleIndex--;
+                    pendingCelebration = null;
+                    // Hide scorecard
+                    if (scorecardVisible) {
+                        scorecardVisible = false;
+                        document.getElementById('scorecardContainer').classList.remove('show');
+                        document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
+                    }
+                    renderCurrentHole();
+                    
+                    // Slide in from left
+                    holeContent.classList.remove('slide-out-right');
+                    holeContent.classList.add('slide-in-left');
+                    
+                    setTimeout(() => {
+                        holeContent.classList.remove('slide-in-left');
+                    }, 150);
+                    
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 150);
             }
         }
         
@@ -3493,16 +3565,31 @@
             }
             
             if (currentHoleIndex < 17) {
-                currentHoleIndex++;
-                // Hide scorecard
-                if (scorecardVisible) {
-                    scorecardVisible = false;
-                    document.getElementById('scorecardContainer').classList.remove('show');
-                    document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
-                }
-                renderCurrentHole();
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                const holeContent = document.getElementById('holeContent');
+                
+                // Slide out to left
+                holeContent.classList.add('slide-out-left');
+                
+                setTimeout(() => {
+                    currentHoleIndex++;
+                    // Hide scorecard
+                    if (scorecardVisible) {
+                        scorecardVisible = false;
+                        document.getElementById('scorecardContainer').classList.remove('show');
+                        document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
+                    }
+                    renderCurrentHole();
+                    
+                    // Slide in from right
+                    holeContent.classList.remove('slide-out-left');
+                    holeContent.classList.add('slide-in-right');
+                    
+                    setTimeout(() => {
+                        holeContent.classList.remove('slide-in-right');
+                    }, 150);
+                    
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 150);
             } else {
                 finishRound();
             }
