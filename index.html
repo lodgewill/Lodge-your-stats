@@ -3919,24 +3919,31 @@
                         // Update index
                         currentHoleIndex++;
                         
-                        // Copy preview content to main (no re-render needed!)
+                        // Prepare holeContent behind the scenes (hidden)
+                        holeContent.style.visibility = 'hidden';
+                        holeContent.style.transition = 'none';
                         holeContent.innerHTML = preview.innerHTML;
-                        
-                        // Reset positions instantly (no transition)
-                        holeContent.classList.add('dragging');
-                        preview.classList.add('dragging');
                         holeContent.style.transform = '';
-                        preview.style.transform = '';
-                        preview.innerHTML = '';
-                        preview.className = 'hole-content-preview';
                         
-                        // Re-enable transitions
+                        // Force reflow
+                        holeContent.offsetHeight;
+                        
+                        // Instant swap - hide preview, show holeContent
+                        // Both at center with same content = no visual change
+                        preview.style.visibility = 'hidden';
+                        holeContent.style.visibility = '';
+                        
+                        // Clean up in next frame
                         requestAnimationFrame(() => {
-                            holeContent.classList.remove('dragging');
-                            preview.classList.remove('dragging');
+                            holeContent.style.transition = '';
+                            preview.innerHTML = '';
+                            preview.className = 'hole-content-preview';
+                            preview.style.visibility = '';
+                            preview.style.transform = '';
+                            preview.style.transition = '';
                         });
                         
-                        // Update other UI elements (progress bar, scorecard, etc)
+                        // Update other UI elements
                         updateProgressBar();
                         updateScorecard();
                         
@@ -3957,21 +3964,27 @@
                         currentHoleIndex--;
                         pendingCelebration = null;
                         
-                        // Copy preview content to main (no re-render needed!)
+                        // Prepare holeContent behind the scenes (hidden)
+                        holeContent.style.visibility = 'hidden';
+                        holeContent.style.transition = 'none';
                         holeContent.innerHTML = preview.innerHTML;
-                        
-                        // Reset positions instantly (no transition)
-                        holeContent.classList.add('dragging');
-                        preview.classList.add('dragging');
                         holeContent.style.transform = '';
-                        preview.style.transform = '';
-                        preview.innerHTML = '';
-                        preview.className = 'hole-content-preview';
                         
-                        // Re-enable transitions
+                        // Force reflow
+                        holeContent.offsetHeight;
+                        
+                        // Instant swap - hide preview, show holeContent
+                        preview.style.visibility = 'hidden';
+                        holeContent.style.visibility = '';
+                        
+                        // Clean up in next frame
                         requestAnimationFrame(() => {
-                            holeContent.classList.remove('dragging');
-                            preview.classList.remove('dragging');
+                            holeContent.style.transition = '';
+                            preview.innerHTML = '';
+                            preview.className = 'hole-content-preview';
+                            preview.style.visibility = '';
+                            preview.style.transform = '';
+                            preview.style.transition = '';
                         });
                         
                         // Update other UI elements
