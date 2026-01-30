@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#1c4932">
-    <title>Golf Stats</title>
+    <title>Lodge your stats</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -54,7 +54,6 @@
             font-size: 13px;
             color: var(--masters-green);
             font-weight: 600;
-            text-transform: uppercase;
             letter-spacing: 1px;
         }
         .tagline {
@@ -210,7 +209,7 @@
             font-weight: 600;
             color: var(--masters-green);
         }
-        .mini-stat-value.good { color: var(--masters-green); }
+        .mini-stat-value.good { color: #107D57; }
         .mini-stat-value.medium { color: var(--medium); }
         .mini-stat-value.bad { color: var(--masters-red); }
         .mini-stat-sub {
@@ -630,7 +629,7 @@
             font-weight: 600;
             color: var(--masters-green);
         }
-        .stat-you.good { color: var(--masters-green); }
+        .stat-you.good { color: #107D57; }
         .stat-you.medium { color: var(--medium); }
         .stat-you.bad { color: var(--masters-red); }
         .stat-you-sub {
@@ -1209,12 +1208,12 @@
             gap: 16px;
         }
         .counter-btn {
-            width: 36px;
-            height: 36px;
+            width: 45px;
+            height: 45px;
             border-radius: 8px;
             border: 2px solid var(--masters-green);
             background: #fff;
-            font-size: 18px;
+            font-size: 22px;
             color: var(--masters-green);
             cursor: pointer;
             display: flex;
@@ -1538,7 +1537,7 @@
     <header class="header" id="mainHeader">
         <div class="header-row">
             <div>
-                <div class="app-name">Golf Stats</div>
+                <div class="app-name">Lodge your stats</div>
                 <div class="tagline">"Drive for show, putt for dough"</div>
                 <div class="greeting" id="greeting"></div>
             </div>
@@ -1592,7 +1591,7 @@
         
         <button class="btn btn-primary" onclick="saveName()">Save</button>
         
-        <div class="section-title" style="margin-left:0;">Settings</div>
+        <div class="section-title" style="margin-left:0;margin-top:32px;">Settings</div>
         
         <div class="toggle-row">
             <div>
@@ -1621,6 +1620,7 @@
     <!-- ==================== HOME TAB ==================== -->
     <div class="tab active" id="homeTab">
         <div class="score-hero" id="scoreHero">
+            <div id="lastRoundLabel" style="position:absolute;top:12px;left:16px;font-size:15px;color:var(--masters-green);font-weight:500;display:none;">Last Round</div>
             <div class="score-giant" id="homeScore">--</div>
             <div class="score-to-par" id="homeToPar"></div>
             <div class="score-meta" id="homeMeta">No rounds yet</div>
@@ -1650,7 +1650,7 @@
         </div>
         
         <div style="margin-top:8px;">
-            <button class="btn btn-primary" onclick="showFunnyModal()">Start New Round</button>
+            <button class="btn btn-primary" onclick="startNewRound()">Start New Round</button>
         </div>
         
         <div class="section-header">
@@ -1905,8 +1905,8 @@
 
     <!-- ==================== COURSES TAB ==================== -->
     <div class="tab" id="coursesTab">
-        <div class="header" style="position:relative;">
-            <div class="history-back" onclick="showTab('playTab')" style="position:absolute;left:0;top:50%;transform:translateY(-50%);">← Back</div>
+        <div class="history-back" onclick="showTab('playTab')" style="padding:16px 20px 0 4px;">← Back</div>
+        <div class="header" style="padding-top:24px;">
             <div class="app-name">Courses</div>
         </div>
         
@@ -1972,8 +1972,8 @@
         let state = {
             profile: { name: '', soundEnabled: true },
             courses: [
-                { id: 1, name: '🌹🐐 (North)', pars: [4,4,4,3,4,4,3,4,5,4,3,4,3,4,5,5,4,4] },
-                { id: 2, name: '🌹🐐 (South)', pars: [4,5,4,3,5,4,4,3,4,4,5,3,4,3,4,4,5,4] },
+                { id: 1, name: 'Rosebud 🐐 (North)', pars: [4,4,4,3,4,4,3,4,5,4,3,4,3,4,5,5,4,4] },
+                { id: 2, name: 'Rosebud 🐐 (South)', pars: [4,5,4,3,5,4,4,3,4,4,5,3,4,3,4,4,5,4] },
                 { id: 3, name: 'Yas Links', pars: [4,5,4,3,4,4,5,3,4,4,5,4,3,4,4,4,3,5] }
             ],
             rounds: [],
@@ -1991,8 +1991,8 @@
         // ==================== STORAGE ====================
         function loadState() {
             const defaultCourses = [
-                { id: 1, name: '🌹🐐 (North)', pars: [4,4,4,3,4,4,3,4,5,4,3,4,3,4,5,5,4,4] },
-                { id: 2, name: '🌹🐐 (South)', pars: [4,5,4,3,5,4,4,3,4,4,5,3,4,3,4,4,5,4] },
+                { id: 1, name: 'Rosebud 🐐 (North)', pars: [4,4,4,3,4,4,3,4,5,4,3,4,3,4,5,5,4,4] },
+                { id: 2, name: 'Rosebud 🐐 (South)', pars: [4,5,4,3,5,4,4,3,4,4,5,3,4,3,4,4,5,4] },
                 { id: 3, name: 'Yas Links', pars: [4,5,4,3,4,4,5,3,4,4,5,4,3,4,4,4,3,5] }
             ];
             
@@ -2000,6 +2000,8 @@
                 const saved = localStorage.getItem('golfStatsAppV2');
                 if (saved) {
                     state = JSON.parse(saved);
+                    // Remove old rose emoji courses (🌹🐐)
+                    state.courses = state.courses.filter(c => !c.name.includes('🌹'));
                     // Ensure default courses exist
                     defaultCourses.forEach(dc => {
                         if (!state.courses.find(c => c.name === dc.name)) {
@@ -2027,6 +2029,9 @@
                     });
                     // Restore editingRoundIndex from state
                     editingRoundIndex = state.editingRoundIndex || null;
+                    
+                    // Save state after migrations/cleanup
+                    saveState();
                 }
             } catch (e) { console.error('Load error:', e); }
             
@@ -2225,6 +2230,7 @@
             updateProfileBtn();
             
             if (state.rounds.length === 0) {
+                document.getElementById('lastRoundLabel').style.display = 'none';
                 document.getElementById('homeScore').textContent = '--';
                 document.getElementById('homeToPar').textContent = '';
                 document.getElementById('homeMeta').textContent = 'No rounds yet';
@@ -2239,6 +2245,9 @@
                 document.getElementById('recentRounds').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⛳</div><div>Play your first round!</div></div>';
                 return;
             }
+            
+            // Show Last Round label
+            document.getElementById('lastRoundLabel').style.display = 'block';
             
             // Last round
             const lastRound = state.rounds[state.rounds.length - 1];
@@ -2662,7 +2671,7 @@
                     <div style="padding: 0 20px 0;">
                         ${generateStatsHTML(stats)}
                     </div>
-                    <div style="text-align:center;padding:16px 20px 0;color:var(--text-faint);font-size:11px;">Golf Stats ⛳</div>
+                    <div style="text-align:center;padding:16px 20px 0;color:var(--text-faint);font-size:11px;">Lodge your stats ⛳</div>
                 </div>
                 <div style="padding: 0 20px 12px;">
                     <button class="btn btn-primary" onclick="shareRoundImage()">📤 Share Round</button>
@@ -3207,19 +3216,19 @@
             // Color functions for round summary
             function getColor(value, threshold) {
                 if (value === null) return '';
-                if (value >= threshold) return 'color:var(--masters-green);';
+                if (value >= threshold) return 'color:#107D57;';
                 if (value >= threshold * 0.7) return 'color:var(--medium);';
                 return 'color:var(--masters-red);';
             }
             function getColorInv(value, threshold) {
                 if (value === null) return '';
-                if (value <= threshold) return 'color:var(--masters-green);';
+                if (value <= threshold) return 'color:#107D57;';
                 if (value <= threshold * 1.2) return 'color:var(--medium);';
                 return 'color:var(--masters-red);';
             }
             function getUDColor(value) {
                 if (value === null) return '';
-                if (value >= 68) return 'color:var(--masters-green);';
+                if (value >= 68) return 'color:#107D57;';
                 if (value >= 55) return 'color:var(--medium);';
                 return 'color:var(--masters-red);';
             }
@@ -3243,7 +3252,7 @@
                     </div>
                     <div style="background:#ffffff;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
                         <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">3-Putts</div>
-                        <div style="font-size:18px;font-weight:600;${stats.threePutts < 1 ? 'color:var(--masters-green);' : stats.threePutts <= 1.5 ? 'color:var(--medium);' : 'color:var(--masters-red);'}">${stats.threePutts}</div>
+                        <div style="font-size:18px;font-weight:600;${stats.threePutts < 1 ? 'color:#107D57;' : stats.threePutts <= 1.5 ? 'color:var(--medium);' : 'color:var(--masters-red);'}">${stats.threePutts}</div>
                         <div style="font-size:11px;color:var(--text-faint);">&nbsp;</div>
                     </div>
                     <div style="background:#ffffff;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
@@ -3268,7 +3277,7 @@
                     </div>
                     <div style="background:#ffffff;padding:12px;border-radius:10px;border:1px solid #e8e8e8;">
                         <div style="font-size:10px;color:var(--masters-green);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">🐦 Birdies</div>
-                        <div style="font-size:18px;font-weight:600;${stats.birdies >= 3 ? 'color:var(--masters-green);' : stats.birdies >= 2 ? 'color:var(--medium);' : 'color:var(--masters-red);'}">${stats.birdies}</div>
+                        <div style="font-size:18px;font-weight:600;${stats.birdies >= 3 ? 'color:#107D57;' : stats.birdies >= 2 ? 'color:var(--medium);' : 'color:var(--masters-red);'}">${stats.birdies}</div>
                         <div style="font-size:11px;color:var(--text-faint);">${stats.eagles > 0 ? '+' + stats.eagles + ' eagles 🦅' : ''}</div>
                     </div>
                 </div>
@@ -3651,6 +3660,42 @@
             }
         }
         
+        // ==================== SWIPE GESTURE HANDLING ====================
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const SWIPE_THRESHOLD = 50;
+        
+        function handleSwipeGesture() {
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) < SWIPE_THRESHOLD) return;
+            
+            if (diff > 0) {
+                // Swiped left - go to next hole
+                if (state.currentRound && currentHoleIndex < 17) {
+                    nextHole();
+                }
+            } else {
+                // Swiped right - go to previous hole
+                if (state.currentRound && currentHoleIndex > 0) {
+                    prevHole();
+                }
+            }
+        }
+        
+        function setupSwipeListeners() {
+            const playActive = document.getElementById('playActive');
+            if (!playActive) return;
+            
+            playActive.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            
+            playActive.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipeGesture();
+            }, { passive: true });
+        }
+        
         // ==================== INIT ====================
         function init() {
             loadState();
@@ -3658,6 +3703,9 @@
             updateProfileBtn();
             updateHomeTab();
             updateCourseSelect();
+            
+            // Setup swipe gestures
+            setupSwipeListeners();
             
             // Check for in-progress round
             if (state.currentRound) {
