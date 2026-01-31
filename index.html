@@ -34,9 +34,9 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg);
             color: var(--text);
-            height: 100vh;
-            height: 100dvh;
-            overflow: hidden;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding-bottom: 90px;
             -webkit-font-smoothing: antialiased;
         }
         
@@ -255,11 +255,8 @@
             background: #f8f8f8;
             border-radius: 12px;
             overflow: hidden;
-            overflow-y: auto;
             border: 1px solid #e8e8e8;
-            margin: 0 20px 20px;
-            flex: 1;
-            min-height: 0;
+            margin: 0 20px 16px;
         }
         .recent-round-row {
             display: flex;
@@ -441,94 +438,39 @@
         .tab { display: none; }
         .tab.active { display: block; }
         #homeTab {
-            height: calc(100vh - 90px);
-            height: calc(100dvh - 90px);
-            overflow: hidden;
-            display: none;
-            flex-direction: column;
+            min-height: calc(100vh - 90px);
+            min-height: calc(100dvh - 90px);
+            padding-bottom: 20px;
         }
-        #homeTab.active { display: flex; }
         
-        /* History Tab */
-        #historyTab {
+        /* Play Tab - fixed height to prevent body scroll */
+        #playTab {
             height: calc(100vh - 90px);
             height: calc(100dvh - 90px);
             overflow: hidden;
-            display: none;
-            flex-direction: column;
         }
-        #historyTab.active { display: flex; }
-        #historyTab .header {
-            flex-shrink: 0;
+        #playTab.scorecard-open {
+            height: auto;
+            overflow: visible;
+        }
+        
+        /* History Tab - full page scroll */
+        #historyTab {
+            min-height: calc(100vh - 90px);
+            min-height: calc(100dvh - 90px);
+            padding-bottom: 20px;
         }
         .history-list-view {
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            display: block;
         }
         .history-list-view.hide {
             display: none;
         }
-        #historyTab .list-container {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            padding-bottom: 20px;
-        }
         
-        /* Stats Tab */
+        /* Stats Tab - full page scroll */
         #statsTab {
-            height: calc(100vh - 90px);
-            height: calc(100dvh - 90px);
-            overflow: hidden;
-            display: none;
-            flex-direction: column;
-        }
-        #statsTab.active { display: flex; }
-        #statsTab .header {
-            flex-shrink: 0;
-        }
-        #statsTab .filter-row {
-            flex-shrink: 0;
-        }
-        #statsTab .custom-dates {
-            flex-shrink: 0;
-        }
-        #statsTab .rounds-badge {
-            flex-shrink: 0;
-        }
-        #statsTab .stats-header {
-            flex-shrink: 0;
-        }
-        .stats-scroll-container {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
-            padding-bottom: 20px;
-        }
-        
-        /* Stats Tab */
-        #statsTab {
-            height: calc(100vh - 90px);
-            height: calc(100dvh - 90px);
-            overflow: hidden;
-            display: none;
-            flex-direction: column;
-        }
-        #statsTab.active { display: flex; }
-        #statsTab .header,
-        #statsTab .filter-row,
-        #statsTab .custom-dates,
-        #statsTab .rounds-badge,
-        #statsTab .stats-header {
-            flex-shrink: 0;
-        }
-        #statsRows {
-            flex: 1;
-            min-height: 0;
-            overflow-y: auto;
+            min-height: calc(100vh - 90px);
+            min-height: calc(100dvh - 90px);
             padding-bottom: 20px;
         }
         
@@ -873,7 +815,7 @@
         .scorecard-container {
             display: none;
             padding: 8px 8px 16px;
-            overflow-x: auto;
+            overflow: hidden;
         }
         .scorecard-container.show {
             display: block;
@@ -1425,13 +1367,13 @@
         .hole-swipe-container {
             position: relative;
             overflow: hidden;
-            overflow-y: auto;
             flex: 1;
             min-height: 0;
         }
         .carousel-track {
             display: flex;
             width: 300%;
+            min-height: 100%;
             transform: translateX(-33.333%);
             transition: transform 0.15s ease-out;
             will-change: transform;
@@ -1445,6 +1387,7 @@
         .carousel-panel {
             width: 33.333%;
             flex-shrink: 0;
+            min-height: 100%;
             background: var(--bg);
         }
         
@@ -1721,11 +1664,275 @@
             padding: 10px 20px;
         }
         
-        /* Play tab scrollable when scorecard is open */
-        #playActive.scorecard-open {
-            overflow-y: auto;
+        /* Play active view - fixed by default */
+        #playActive {
+            display: flex;
+            flex-direction: column;
             height: calc(100vh - 90px);
             height: calc(100dvh - 90px);
+            overflow: hidden;
+        }
+        
+        /* Play tab scrollable when scorecard is open - entire content scrolls */
+        #playActive.scorecard-open {
+            overflow-y: auto;
+            height: auto;
+            max-height: none;
+        }
+        #playActive.scorecard-open .hole-swipe-container {
+            flex: none;
+        }
+        #playActive.scorecard-open .carousel-track,
+        #playActive.scorecard-open .carousel-panel {
+            min-height: auto;
+        }
+        
+        /* ==================== RESPONSIVE: Medium height screens (iPhone 13/14/15) ==================== */
+        @media (max-height: 800px) {
+            .progress-bar {
+                padding: 12px 20px;
+            }
+            .progress-track {
+                height: 5px;
+            }
+            .progress-info {
+                margin-top: 8px;
+            }
+            .scorecard-toggle {
+                padding: 10px 20px;
+            }
+            .scoring-header {
+                padding: 8px 0;
+            }
+            .hole-number {
+                font-size: 42px;
+                margin: 2px 0;
+            }
+            .score-input {
+                padding: 12px;
+                margin: 0 20px 8px;
+                gap: 20px;
+            }
+            .score-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 22px;
+            }
+            .score-current-num {
+                font-size: 34px;
+            }
+            .stat-card {
+                padding: 10px 14px;
+                margin: 0 20px 6px;
+            }
+            .stat-card-title {
+                font-size: 10px;
+                margin-bottom: 8px;
+            }
+            .yes-no-btn {
+                padding: 10px;
+                font-size: 12px;
+            }
+            .putt-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            .counter-btn {
+                width: 34px;
+                height: 34px;
+            }
+            .counter-value {
+                font-size: 16px;
+                min-width: 28px;
+            }
+            .putts-row, .counter-row {
+                gap: 10px;
+            }
+        }
+        
+        /* ==================== RESPONSIVE: Small height screens (iPhone SE, mini, older) ==================== */
+        @media (max-height: 700px) {
+            .progress-bar {
+                padding: 10px 16px;
+            }
+            .progress-track {
+                height: 4px;
+            }
+            .progress-info {
+                margin-top: 6px;
+            }
+            .progress-text {
+                font-size: 11px;
+            }
+            .live-score {
+                font-size: 13px;
+            }
+            .scorecard-toggle {
+                padding: 8px 16px;
+            }
+            .scorecard-toggle-btn {
+                font-size: 11px;
+                padding: 6px 14px;
+            }
+            .scoring-header {
+                padding: 4px 0;
+            }
+            .hole-label {
+                font-size: 9px;
+                letter-spacing: 1.5px;
+            }
+            .hole-number {
+                font-size: 34px;
+                margin: 0;
+            }
+            .hole-par {
+                font-size: 11px;
+            }
+            .score-input {
+                padding: 10px;
+                margin: 0 16px 6px;
+                gap: 16px;
+                border-radius: 12px;
+            }
+            .score-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
+            .score-current-num {
+                font-size: 30px;
+            }
+            .score-current-label {
+                font-size: 10px;
+            }
+            .stat-card {
+                padding: 8px 12px;
+                margin: 0 16px 4px;
+                border-radius: 10px;
+            }
+            .stat-card-title {
+                font-size: 9px;
+                margin-bottom: 6px;
+            }
+            .stat-card-subtitle {
+                font-size: 9px;
+            }
+            .yes-no-btn {
+                padding: 8px;
+                font-size: 11px;
+                border-radius: 6px;
+            }
+            .yes-no-row {
+                gap: 8px;
+            }
+            .putt-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
+                border-radius: 6px;
+            }
+            .putts-buttons {
+                gap: 6px;
+            }
+            .putts-label, .counter-label {
+                font-size: 12px;
+            }
+            .counter-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+            .counter-value {
+                font-size: 15px;
+                min-width: 24px;
+            }
+            .counter-controls {
+                gap: 6px;
+            }
+            .sub-option-label {
+                font-size: 11px;
+                margin-bottom: 6px;
+            }
+        }
+        
+        /* ==================== RESPONSIVE: Very small height screens ==================== */
+        @media (max-height: 640px) {
+            .progress-bar {
+                padding: 8px 16px;
+            }
+            .scorecard-toggle {
+                padding: 6px 16px;
+            }
+            .scoring-header {
+                padding: 2px 0;
+            }
+            .hole-number {
+                font-size: 28px;
+            }
+            .score-input {
+                padding: 8px;
+                margin: 0 12px 4px;
+                gap: 12px;
+            }
+            .score-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            .score-current-num {
+                font-size: 26px;
+            }
+            .stat-card {
+                padding: 6px 10px;
+                margin: 0 12px 3px;
+            }
+            .yes-no-btn {
+                padding: 6px;
+                font-size: 10px;
+            }
+            .putt-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            .counter-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 12px;
+            }
+        }
+        
+        /* ==================== RESPONSIVE: Scorecard width scaling ==================== */
+        @media (max-width: 420px) {
+            .masters-scoreboard-scene {
+                transform: scale(0.92);
+                transform-origin: top center;
+            }
+            .scorecard-container {
+                padding: 8px 4px 8px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .masters-scoreboard-scene {
+                transform: scale(0.88);
+                transform-origin: top center;
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .masters-scoreboard-scene {
+                transform: scale(0.82);
+                transform-origin: top center;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .masters-scoreboard-scene {
+                transform: scale(0.76);
+                transform-origin: top center;
+            }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1981,9 +2188,7 @@
             </div>
         </div>
         
-        <div class="stats-scroll-container">
-            <div id="statsRows"></div>
-        </div>
+        <div id="statsRows"></div>
     </div>
 
     <!-- ==================== HISTORY TAB ==================== -->
@@ -2961,6 +3166,7 @@
             scorecardVisible = false;
             document.getElementById('scorecardContainer').classList.remove('show');
             document.getElementById('playActive').classList.remove('scorecard-open');
+            document.getElementById('playTab').classList.remove('scorecard-open');
             finishAttempted = false;
             
             saveState();
@@ -3041,7 +3247,7 @@
                 document.getElementById('mainHeader').style.display = 'block';
             } else {
                 document.getElementById('playSetup').style.display = 'none';
-                document.getElementById('playActive').style.display = 'block';
+                document.getElementById('playActive').style.display = 'flex';
                 document.getElementById('mainHeader').style.display = 'none';
                 renderScorecard();
                 renderCurrentHole();
@@ -3085,6 +3291,7 @@
             scorecardVisible = false;
             document.getElementById('scorecardContainer').classList.remove('show');
             document.getElementById('playActive').classList.remove('scorecard-open');
+            document.getElementById('playTab').classList.remove('scorecard-open');
             finishAttempted = false;
             editingRoundIndex = null;
             state.editingRoundIndex = null;
@@ -3096,6 +3303,7 @@
             scorecardVisible = !scorecardVisible;
             document.getElementById('scorecardContainer').classList.toggle('show', scorecardVisible);
             document.getElementById('playActive').classList.toggle('scorecard-open', scorecardVisible);
+            document.getElementById('playTab').classList.toggle('scorecard-open', scorecardVisible);
             document.getElementById('scorecardToggleBtn').textContent = scorecardVisible ? 'Hide Scorecard' : 'View Scorecard';
             if (scorecardVisible) renderScorecard();
         }
@@ -3717,6 +3925,7 @@
                         scorecardVisible = false;
                         document.getElementById('scorecardContainer').classList.remove('show');
                         document.getElementById('playActive').classList.remove('scorecard-open');
+            document.getElementById('playTab').classList.remove('scorecard-open');
                         document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                     }
                     
@@ -3762,6 +3971,7 @@
                         scorecardVisible = false;
                         document.getElementById('scorecardContainer').classList.remove('show');
                         document.getElementById('playActive').classList.remove('scorecard-open');
+            document.getElementById('playTab').classList.remove('scorecard-open');
                         document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                     }
                     
@@ -3996,6 +4206,7 @@
                 scorecardVisible = false;
                 document.getElementById('scorecardContainer').classList.remove('show');
                 document.getElementById('playActive').classList.remove('scorecard-open');
+            document.getElementById('playTab').classList.remove('scorecard-open');
                 document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
             }
             
@@ -4199,6 +4410,7 @@
                             scorecardVisible = false;
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('playActive').classList.remove('scorecard-open');
+            document.getElementById('playTab').classList.remove('scorecard-open');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
                         
@@ -4244,6 +4456,7 @@
                             scorecardVisible = false;
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('playActive').classList.remove('scorecard-open');
+            document.getElementById('playTab').classList.remove('scorecard-open');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
                         
