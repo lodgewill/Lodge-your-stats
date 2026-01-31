@@ -444,7 +444,6 @@
             height: calc(100vh - 90px);
             height: calc(100dvh - 90px);
             overflow: hidden;
-            display: flex;
             flex-direction: column;
         }
         #homeTab.active { display: flex; }
@@ -1752,7 +1751,6 @@
         
         <div class="section-header">
             <span class="section-title">Recent Rounds</span>
-            <span class="section-badge" id="recentRoundsBadge"></span>
         </div>
         <div class="recent-rounds-list" id="recentRounds">
             <div class="empty-state">
@@ -2262,7 +2260,6 @@
                 document.getElementById('homePutts').textContent = '--';
                 document.getElementById('homePutts').className = 'mini-stat-value';
                 document.getElementById('homeBirdies').textContent = '0';
-                document.getElementById('recentRoundsBadge').textContent = '';
                 document.getElementById('recentRounds').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⛳</div><div>Play your first round!</div></div>';
                 return;
             }
@@ -2299,7 +2296,6 @@
             
             // Recent rounds (limited to 10, see History for more)
             const recent = [...state.rounds].reverse().slice(0, 10);
-            document.getElementById('recentRoundsBadge').textContent = state.rounds.length > 0 ? state.rounds.length : '';
             document.getElementById('recentRounds').innerHTML = recent.length === 0 
                 ? '<div class="empty-state"><div class="empty-state-icon">⛳</div><div>Play your first round!</div></div>'
                 : recent.map((r, idx) => {
@@ -3022,6 +3018,7 @@
             
             function isHoleIncomplete(hole) {
                 if (hole.score === 0 || hole.score === null) return true;
+                // Only check other fields if score has been entered
                 if (hole.par >= 4 && hole.fairway === null) return true;
                 if (hole.upDownAttempt === true && hole.upDownMade === null) return true;
                 return false;
@@ -3399,16 +3396,20 @@
         function adjustScore(delta) {
             const hole = state.currentRound.holes[currentHoleIndex];
             const newScore = hole.score + delta;
-            if (newScore < 1 || newScore > 15) return;
+            if (newScore < 0 || newScore > 15) return;
             
             hole.score = newScore;
             
             // Check for pending celebration (will trigger on next hole)
-            const diff = hole.score - hole.par;
-            if (diff === -1) {
-                pendingCelebration = 'birdie';
-            } else if (diff <= -2) {
-                pendingCelebration = 'eagle';
+            if (newScore > 0) {
+                const diff = hole.score - hole.par;
+                if (diff === -1) {
+                    pendingCelebration = 'birdie';
+                } else if (diff <= -2) {
+                    pendingCelebration = 'eagle';
+                } else {
+                    pendingCelebration = null;
+                }
             } else {
                 pendingCelebration = null;
             }
@@ -3502,7 +3503,7 @@
         function updateLiveScore() {
             let total = 0, par = 0;
             state.currentRound.holes.forEach(h => {
-                if (h.score !== null) {
+                if (h.score > 0) {
                     total += h.score;
                     par += h.par;
                 }
@@ -3601,9 +3602,13 @@
             const incompleteHoles = [];
             state.currentRound.holes.forEach((h, idx) => {
                 const issues = [];
-                if (h.score === 0 || h.score === null) issues.push('score');
-                if (h.par >= 4 && h.fairway === null) issues.push('fairway');
-                if (h.upDownAttempt === true && h.upDownMade === null) issues.push('up&down made');
+                if (h.score === 0 || h.score === null) {
+                    issues.push('score');
+                } else {
+                    // Only validate other fields if score has been entered
+                    if (h.par >= 4 && h.fairway === null) issues.push('fairway');
+                    if (h.upDownAttempt === true && h.upDownMade === null) issues.push('up&down made');
+                }
                 if (issues.length > 0) {
                     incompleteHoles.push({ hole: idx + 1, issues });
                 }
@@ -3817,15 +3822,19 @@
         function generateHoleContentHTML(holeIndex) {
             if (!state.currentRound || holeIndex < 0 || holeIndex > 17) return '';
             const hole = state.currentRound.holes[holeIndex];
-            const score = hole.score || hole.par;
-            const diff = score - hole.par;
+            const score = hole.score;
+            const displayScore = score === 0 ? '0' : score;
             
-            let scoreLabel = 'Par', labelClass = '';
-            if (score === 0 || score === hole.par) { scoreLabel = 'Par'; }
-            else if (diff <= -2) { scoreLabel = 'Eagle!'; labelClass = 'eagle'; }
-            else if (diff === -1) { scoreLabel = 'Birdie!'; labelClass = 'birdie'; }
-            else if (diff === 1) { scoreLabel = 'Bogey'; labelClass = 'bogey'; }
-            else if (diff >= 2) { scoreLabel = 'Double'; labelClass = 'double-bogey'; }
+            let scoreLabel = '--', labelClass = '';
+            if (score === 0) { scoreLabel = '--'; labelClass = ''; }
+            else if (score === hole.par) { scoreLabel = 'Par'; labelClass = ''; }
+            else {
+                const diff = score - hole.par;
+                if (diff <= -2) { scoreLabel = 'Eagle!'; labelClass = 'eagle'; }
+                else if (diff === -1) { scoreLabel = 'Birdie!'; labelClass = 'birdie'; }
+                else if (diff === 1) { scoreLabel = 'Bogey'; labelClass = 'bogey'; }
+                else if (diff >= 2) { scoreLabel = 'Double'; labelClass = 'double-bogey'; }
+            }
             
             const showFairway = hole.par >= 4;
             const fairwayYesClass = hole.fairway === true ? 'selected-yes' : '';
@@ -3847,7 +3856,7 @@
                 <div class="score-input">
                     <button class="score-btn" onclick="adjustScore(-1)">−</button>
                     <div class="score-current">
-                        <div class="score-current-num">${score}</div>
+                        <div class="score-current-num">${displayScore}</div>
                         <div class="score-current-label ${labelClass}">${scoreLabel}</div>
                     </div>
                     <button class="score-btn" onclick="adjustScore(1)">+</button>
