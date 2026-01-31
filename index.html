@@ -1277,39 +1277,28 @@
         }
         .play-nav .btn { flex: 1; margin: 0; }
         
-        /* Hole Content Swipe Container */
+        /* Hole Content Carousel */
         .hole-swipe-container {
             position: relative;
             overflow: hidden;
         }
-        .hole-content {
-            position: relative;
-            transition: transform 0.25s ease-out;
+        .carousel-track {
+            display: flex;
+            width: 300%;
+            transform: translateX(-33.333%);
+            transition: transform 0.3s ease-out;
             will-change: transform;
-            z-index: 1;
         }
-        .hole-content.dragging {
+        .carousel-track.dragging {
             transition: none;
         }
-        .hole-content-preview {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            transition: transform 0.25s ease-out;
-            will-change: transform;
+        .carousel-track.no-transition {
+            transition: none;
+        }
+        .carousel-panel {
+            width: 33.333%;
+            flex-shrink: 0;
             background: var(--bg);
-            pointer-events: auto;
-            z-index: 2;
-        }
-        .hole-content-preview.dragging {
-            transition: none;
-        }
-        .hole-content-preview.next {
-            transform: translateX(100%);
-        }
-        .hole-content-preview.prev {
-            transform: translateX(-100%);
         }
         
         /* Hole Grid */
@@ -1753,95 +1742,14 @@
                 </div>
             </div>
             
-            <!-- Hole Swipe Container -->
+            <!-- Hole Swipe Container - Carousel -->
             <div class="hole-swipe-container" id="holeSwipeContainer">
-                <!-- Preview for next/prev hole -->
-                <div class="hole-content-preview" id="holePreview"></div>
-                
-                <!-- Hole Content (animated on swipe) -->
-                <div class="hole-content" id="holeContent">
-                    <!-- Hole Info -->
-                    <div class="scoring-header">
-                        <div class="hole-label">Hole</div>
-                        <div class="hole-number" id="currentHoleNum">1</div>
-                        <div class="hole-par" id="currentHolePar">Par 4</div>
-                    </div>
-                    
-                    <!-- Score Input -->
-                    <div class="score-input">
-                        <button class="score-btn" onclick="adjustScore(-1)">−</button>
-                        <div class="score-current">
-                            <div class="score-current-num" id="currentScore">4</div>
-                            <div class="score-current-label" id="currentScoreLabel">Par</div>
-                        </div>
-                        <button class="score-btn" onclick="adjustScore(1)">+</button>
-                    </div>
-                    
-                    <!-- Fairway Hit (Par 4 and 5 only) -->
-                    <div class="stat-card" id="fairwayCard">
-                        <div class="stat-card-title">Fairway Hit?</div>
-                        <div class="yes-no-row">
-                            <button class="yes-no-btn" id="fairwayYes" onclick="setFairway(true)">Yes</button>
-                            <button class="yes-no-btn" id="fairwayNo" onclick="setFairway(false)">No</button>
-                        </div>
-                    </div>
-                
-                <!-- Putts and Gettable Putts side by side -->
-                <div class="putting-row">
-                    <div class="stat-card putting-card-small" style="display:flex;flex-direction:column;">
-                        <div class="stat-card-title">Putts</div>
-                        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
-                            <div class="counter-controls">
-                                <button class="counter-btn" onclick="adjustPutts(-1)">−</button>
-                                <span class="counter-value" id="puttsValue">0</span>
-                                <button class="counter-btn" onclick="adjustPutts(1)">+</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-card putting-card-large">
-                        <div class="stat-card-title">Gettable Putts <span class="stat-card-subtitle">(4-12ft)</span></div>
-                        <div class="counter-row">
-                            <span class="counter-label">Made</span>
-                            <div class="counter-controls">
-                                <button class="counter-btn" onclick="adjustGettableMade(-1)">−</button>
-                                <span class="counter-value" id="gettableMadeValue">0</span>
-                                <button class="counter-btn" onclick="adjustGettableMade(1)">+</button>
-                            </div>
-                        </div>
-                        <div class="counter-row">
-                            <span class="counter-label">Total attempts</span>
-                            <div class="counter-controls">
-                                <button class="counter-btn" onclick="adjustGettableTotal(-1)">−</button>
-                                <span class="counter-value" id="gettableTotalValue">0</span>
-                                <button class="counter-btn" onclick="adjustGettableTotal(1)">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Up & Down -->
-                <div class="stat-card">
-                    <div class="stat-card-title">Up & Down <span class="stat-card-subtitle">(&lt;15m from green)</span></div>
-                    <div class="sub-option">
-                        <div class="sub-option-label">Up & Down attempt?</div>
-                        <button class="yes-no-btn single" id="upDownAttemptYes" onclick="toggleUpDownAttempt()">Yes</button>
-                    </div>
-                    <div class="conditional-section" id="upDownDetails">
-                        <div class="sub-option">
-                            <div class="sub-option-label">Up & Down made? <span id="upDownMadeWarning" style="color:var(--bad);display:none;"> ⚠</span></div>
-                            <div class="yes-no-row">
-                                <button class="yes-no-btn" id="upDownMadeYes" onclick="setUpDownMade(true)">Yes</button>
-                                <button class="yes-no-btn" id="upDownMadeNo" onclick="setUpDownMade(false)">No</button>
-                            </div>
-                        </div>
-                        <div class="sub-option">
-                            <div class="sub-option-label">From bunker?</div>
-                            <button class="yes-no-btn single" id="fromBunkerBtn" onclick="setFromBunker()">Yes</button>
-                        </div>
-                    </div>
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-panel" id="panelPrev"></div>
+                    <div class="carousel-panel" id="panelCurrent"></div>
+                    <div class="carousel-panel" id="panelNext"></div>
                 </div>
             </div>
-        </div>
             
             <!-- Navigation -->
             <div class="play-nav">
@@ -2966,20 +2874,25 @@
             const targetIndex = holeNum - 1;
             if (targetIndex === currentHoleIndex) return;
             
-            const holeContent = document.getElementById('holeContent');
-            const containerWidth = document.getElementById('holeSwipeContainer').offsetWidth;
+            const track = document.getElementById('carouselTrack');
             const goingForward = targetIndex > currentHoleIndex;
             
-            // Quick slide animation
-            holeContent.style.transform = `translateX(${goingForward ? -containerWidth : containerWidth}px)`;
+            // Animate in the direction of travel
+            track.style.transform = `translateX(${goingForward ? '-66.666%' : '0%'})`;
             
             setTimeout(() => {
                 currentHoleIndex = targetIndex;
                 pendingCelebration = null;
-                renderCurrentHole();
-                holeContent.style.transform = '';
+                renderCarouselPanels();
+                updateProgressBar();
+                updateScorecard();
+                
+                // Update next button text
+                const isEditing = editingRoundIndex !== null;
+                document.getElementById('nextHoleBtn').textContent = currentHoleIndex === 17 ? (isEditing ? 'Save →' : 'Finish →') : 'Next →';
+                
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 150);
+            }, 300);
         }
         
         function generateScorecardHTML(round, course, playerName) {
@@ -3342,57 +3255,8 @@
         }
         
         function renderCurrentHole() {
-            const hole = state.currentRound.holes[currentHoleIndex];
-            
-            document.getElementById('currentHoleNum').textContent = hole.hole;
-            document.getElementById('currentHolePar').textContent = 'Par ' + hole.par;
-            document.getElementById('currentScore').textContent = hole.score;
-            
-            // Score label
-            const diff = hole.score - hole.par;
-            let label = 'Par', labelClass = '';
-            if (hole.score === 0) { label = '--'; labelClass = ''; }
-            else if (diff <= -2) { label = 'Eagle!'; labelClass = 'eagle'; }
-            else if (diff === -1) { label = 'Birdie!'; labelClass = 'birdie'; }
-            else if (diff === 1) { label = 'Bogey'; labelClass = 'bogey'; }
-            else if (diff === 2) { label = 'Double'; labelClass = 'double-bogey'; }
-            else if (diff >= 3) { label = '+' + diff; labelClass = 'double-bogey'; }
-            
-            document.getElementById('currentScoreLabel').textContent = label;
-            document.getElementById('currentScoreLabel').className = 'score-current-label ' + labelClass;
-            
-            // Fairway (only for par 4 and 5)
-            const fwCard = document.getElementById('fairwayCard');
-            if (hole.par >= 4) {
-                fwCard.style.display = 'block';
-                document.getElementById('fairwayYes').className = 'yes-no-btn' + (hole.fairway === true ? ' selected-yes' : '');
-                document.getElementById('fairwayNo').className = 'yes-no-btn' + (hole.fairway === false ? ' selected-no' : '');
-            } else {
-                fwCard.style.display = 'none';
-            }
-            
-            // Putts counter
-            document.getElementById('puttsValue').textContent = hole.putts || 0;
-            
-            // Gettable putts
-            document.getElementById('gettableMadeValue').textContent = hole.gettableMade || 0;
-            document.getElementById('gettableTotalValue').textContent = hole.gettableTotal || 0;
-            
-            // Up & Down
-            const upDownDetails = document.getElementById('upDownDetails');
-            const upDownAttemptYes = document.getElementById('upDownAttemptYes');
-            
-            upDownAttemptYes.className = 'yes-no-btn single' + (hole.upDownAttempt === true ? ' selected-yes' : '');
-            
-            if (hole.upDownAttempt === true) {
-                upDownDetails.classList.add('show');
-                
-                document.getElementById('upDownMadeYes').className = 'yes-no-btn' + (hole.upDownMade === true ? ' selected-yes' : '');
-                document.getElementById('upDownMadeNo').className = 'yes-no-btn' + (hole.upDownMade === false ? ' selected-no' : '');
-                document.getElementById('fromBunkerBtn').className = 'yes-no-btn single' + (hole.fromBunker ? ' selected-yes' : '');
-            } else {
-                upDownDetails.classList.remove('show');
-            }
+            // Render all three carousel panels
+            renderCarouselPanels();
             
             // Progress
             document.getElementById('progressFill').style.width = ((currentHoleIndex + 1) / 18 * 100) + '%';
@@ -3410,6 +3274,36 @@
             
             // Update scorecard if visible
             if (scorecardVisible) renderScorecard();
+        }
+        
+        function renderCarouselPanels() {
+            // Render previous panel (if exists)
+            const prevPanel = document.getElementById('panelPrev');
+            if (currentHoleIndex > 0) {
+                prevPanel.innerHTML = generateHoleContentHTML(currentHoleIndex - 1);
+            } else {
+                prevPanel.innerHTML = '';
+            }
+            
+            // Render current panel
+            const currentPanel = document.getElementById('panelCurrent');
+            currentPanel.innerHTML = generateHoleContentHTML(currentHoleIndex);
+            
+            // Render next panel (if exists)
+            const nextPanel = document.getElementById('panelNext');
+            if (currentHoleIndex < 17) {
+                nextPanel.innerHTML = generateHoleContentHTML(currentHoleIndex + 1);
+            } else {
+                nextPanel.innerHTML = '';
+            }
+            
+            // Reset carousel position (center panel visible)
+            const track = document.getElementById('carouselTrack');
+            track.classList.add('no-transition');
+            track.style.transform = 'translateX(-33.333%)';
+            // Force reflow
+            track.offsetHeight;
+            track.classList.remove('no-transition');
         }
         
         function adjustScore(delta) {
@@ -3529,11 +3423,10 @@
         
         function prevHole() {
             if (currentHoleIndex > 0) {
-                const holeContent = document.getElementById('holeContent');
-                const containerWidth = document.getElementById('holeSwipeContainer').offsetWidth;
+                const track = document.getElementById('carouselTrack');
                 
-                // Quick slide animation
-                holeContent.style.transform = `translateX(${containerWidth}px)`;
+                // Animate to previous panel (slide right to show prev panel)
+                track.style.transform = 'translateX(0%)';
                 
                 setTimeout(() => {
                     currentHoleIndex--;
@@ -3543,10 +3436,14 @@
                         document.getElementById('scorecardContainer').classList.remove('show');
                         document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                     }
-                    renderCurrentHole();
-                    holeContent.style.transform = '';
+                    
+                    // Re-render panels and reset position instantly
+                    renderCarouselPanels();
+                    updateProgressBar();
+                    updateScorecard();
+                    
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 150);
+                }, 300);
             }
         }
         
@@ -3558,11 +3455,10 @@
             }
             
             if (currentHoleIndex < 17) {
-                const holeContent = document.getElementById('holeContent');
-                const containerWidth = document.getElementById('holeSwipeContainer').offsetWidth;
+                const track = document.getElementById('carouselTrack');
                 
-                // Quick slide animation
-                holeContent.style.transform = `translateX(-${containerWidth}px)`;
+                // Animate to next panel (slide left to show next panel)
+                track.style.transform = 'translateX(-66.666%)';
                 
                 setTimeout(() => {
                     currentHoleIndex++;
@@ -3571,10 +3467,14 @@
                         document.getElementById('scorecardContainer').classList.remove('show');
                         document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                     }
-                    renderCurrentHole();
-                    holeContent.style.transform = '';
+                    
+                    // Re-render panels and reset position instantly
+                    renderCarouselPanels();
+                    updateProgressBar();
+                    updateScorecard();
+                    
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 150);
+                }, 300);
             } else {
                 finishRound();
             }
@@ -3737,7 +3637,6 @@
         let touchCurrentX = 0;
         let isDragging = false;
         let swipeDirection = null;
-        let swipeAnimating = false;
         const SWIPE_THRESHOLD = 80;
         
         function generateHoleContentHTML(holeIndex) {
@@ -3766,24 +3665,24 @@
             return `
                 <div class="scoring-header">
                     <div class="hole-label">Hole</div>
-                    <div class="hole-number" id="currentHoleNum">${hole.hole}</div>
-                    <div class="hole-par" id="currentHolePar">Par ${hole.par}</div>
+                    <div class="hole-number">${hole.hole}</div>
+                    <div class="hole-par">Par ${hole.par}</div>
                 </div>
                 
                 <div class="score-input">
                     <button class="score-btn" onclick="adjustScore(-1)">−</button>
                     <div class="score-current">
-                        <div class="score-current-num" id="currentScore">${score}</div>
-                        <div class="score-current-label ${labelClass}" id="currentScoreLabel">${scoreLabel}</div>
+                        <div class="score-current-num">${score}</div>
+                        <div class="score-current-label ${labelClass}">${scoreLabel}</div>
                     </div>
                     <button class="score-btn" onclick="adjustScore(1)">+</button>
                 </div>
                 
-                <div class="stat-card" id="fairwayCard" style="${showFairway ? '' : 'display:none;'}">
+                <div class="stat-card" style="${showFairway ? '' : 'display:none;'}">
                     <div class="stat-card-title">Fairway Hit?</div>
                     <div class="yes-no-row">
-                        <button class="yes-no-btn ${fairwayYesClass}" id="fairwayYes" onclick="setFairway(true)">Yes</button>
-                        <button class="yes-no-btn ${fairwayNoClass}" id="fairwayNo" onclick="setFairway(false)">No</button>
+                        <button class="yes-no-btn ${fairwayYesClass}" onclick="setFairway(true)">Yes</button>
+                        <button class="yes-no-btn ${fairwayNoClass}" onclick="setFairway(false)">No</button>
                     </div>
                 </div>
                 
@@ -3793,7 +3692,7 @@
                         <div style="flex:1;display:flex;align-items:center;justify-content:center;">
                             <div class="counter-controls">
                                 <button class="counter-btn" onclick="adjustPutts(-1)">−</button>
-                                <span class="counter-value" id="puttsValue">${hole.putts || 0}</span>
+                                <span class="counter-value">${hole.putts || 0}</span>
                                 <button class="counter-btn" onclick="adjustPutts(1)">+</button>
                             </div>
                         </div>
@@ -3804,7 +3703,7 @@
                             <span class="counter-label">Made</span>
                             <div class="counter-controls">
                                 <button class="counter-btn" onclick="adjustGettableMade(-1)">−</button>
-                                <span class="counter-value" id="gettableMadeValue">${hole.gettableMade || 0}</span>
+                                <span class="counter-value">${hole.gettableMade || 0}</span>
                                 <button class="counter-btn" onclick="adjustGettableMade(1)">+</button>
                             </div>
                         </div>
@@ -3812,7 +3711,7 @@
                             <span class="counter-label">Total attempts</span>
                             <div class="counter-controls">
                                 <button class="counter-btn" onclick="adjustGettableTotal(-1)">−</button>
-                                <span class="counter-value" id="gettableTotalValue">${hole.gettableTotal || 0}</span>
+                                <span class="counter-value">${hole.gettableTotal || 0}</span>
                                 <button class="counter-btn" onclick="adjustGettableTotal(1)">+</button>
                             </div>
                         </div>
@@ -3823,101 +3722,51 @@
                     <div class="stat-card-title">Up & Down <span class="stat-card-subtitle">(&lt;15m from green)</span></div>
                     <div class="sub-option">
                         <div class="sub-option-label">Up & Down attempt?</div>
-                        <button class="yes-no-btn single ${upDownAttemptClass}" id="upDownAttemptYes" onclick="toggleUpDownAttempt()">Yes</button>
+                        <button class="yes-no-btn single ${upDownAttemptClass}" onclick="toggleUpDownAttempt()">Yes</button>
                     </div>
-                    <div class="conditional-section ${upDownDetailsShow}" id="upDownDetails">
+                    <div class="conditional-section ${upDownDetailsShow}">
                         <div class="sub-option">
-                            <div class="sub-option-label">Up & Down made? <span id="upDownMadeWarning" style="color:var(--bad);display:none;"> ⚠</span></div>
+                            <div class="sub-option-label">Up & Down made?</div>
                             <div class="yes-no-row">
-                                <button class="yes-no-btn ${upDownMadeYesClass}" id="upDownMadeYes" onclick="setUpDownMade(true)">Yes</button>
-                                <button class="yes-no-btn ${upDownMadeNoClass}" id="upDownMadeNo" onclick="setUpDownMade(false)">No</button>
+                                <button class="yes-no-btn ${upDownMadeYesClass}" onclick="setUpDownMade(true)">Yes</button>
+                                <button class="yes-no-btn ${upDownMadeNoClass}" onclick="setUpDownMade(false)">No</button>
                             </div>
                         </div>
                         <div class="sub-option">
                             <div class="sub-option-label">From bunker?</div>
-                            <button class="yes-no-btn single ${fromBunkerClass}" id="fromBunkerBtn" onclick="setFromBunker()">Yes</button>
+                            <button class="yes-no-btn single ${fromBunkerClass}" onclick="setFromBunker()">Yes</button>
                         </div>
                     </div>
                 </div>
             `;
         }
         
-        // Sync the visual state with current hole index - called before any interaction
-        function syncHoleContent() {
-            const holeContent = document.getElementById('holeContent');
-            const preview = document.getElementById('holePreview');
-            
-            // Instant update - no transitions
-            holeContent.style.transition = 'none';
-            preview.style.transition = 'none';
-            
-            holeContent.innerHTML = generateHoleContentHTML(currentHoleIndex);
-            holeContent.style.transform = '';
-            
-            preview.innerHTML = '';
-            preview.style.transform = '';
-            preview.classList.remove('next', 'prev');
-            
-            void holeContent.offsetHeight;
-            
-            requestAnimationFrame(() => {
-                holeContent.style.transition = '';
-                preview.style.transition = '';
-            });
-        }
-        
         function setupSwipeListeners() {
             const swipeContainer = document.getElementById('holeSwipeContainer');
             if (!swipeContainer) return;
             
-            let needsSync = false;
-            
             swipeContainer.addEventListener('touchstart', (e) => {
-                if (!state.currentRound || swipeAnimating) return;
-                
+                if (!state.currentRound) return;
                 touchStartX = e.touches[0].clientX;
                 touchCurrentX = touchStartX;
                 isDragging = true;
                 swipeDirection = null;
-                needsSync = true; // Mark that we need to sync, but don't do it yet (allows taps to work)
+                
+                const track = document.getElementById('carouselTrack');
+                track.classList.add('dragging');
             }, { passive: true });
             
             swipeContainer.addEventListener('touchmove', (e) => {
-                if (!isDragging || !state.currentRound || swipeAnimating) return;
+                if (!isDragging || !state.currentRound) return;
                 
                 touchCurrentX = e.touches[0].clientX;
                 const deltaX = touchCurrentX - touchStartX;
+                const containerWidth = swipeContainer.offsetWidth;
                 
-                // Determine swipe direction and setup preview
+                // Determine swipe direction
                 if (Math.abs(deltaX) > 10 && swipeDirection === null) {
-                    // NOW sync the content since we're actually swiping (not just tapping)
-                    if (needsSync) {
-                        syncHoleContent();
-                        needsSync = false;
-                        
-                        // Add dragging class after sync
-                        const holeContent = document.getElementById('holeContent');
-                        const preview = document.getElementById('holePreview');
-                        holeContent.classList.add('dragging');
-                        preview.classList.add('dragging');
-                    }
-                    
                     swipeDirection = deltaX > 0 ? 'right' : 'left';
-                    
-                    const preview = document.getElementById('holePreview');
-                    if (swipeDirection === 'left' && currentHoleIndex < 17) {
-                        preview.innerHTML = generateHoleContentHTML(currentHoleIndex + 1);
-                        preview.classList.add('next');
-                        preview.classList.remove('prev');
-                    } else if (swipeDirection === 'right' && currentHoleIndex > 0) {
-                        preview.innerHTML = generateHoleContentHTML(currentHoleIndex - 1);
-                        preview.classList.add('prev');
-                        preview.classList.remove('next');
-                    }
                 }
-                
-                // Only move if we've established a swipe direction
-                if (swipeDirection === null) return;
                 
                 // Apply resistance at boundaries
                 let adjustedDelta = deltaX;
@@ -3926,52 +3775,45 @@
                     adjustedDelta = deltaX * 0.2;
                 }
                 
-                const holeContent = document.getElementById('holeContent');
-                const preview = document.getElementById('holePreview');
+                // Convert pixel delta to percentage offset from center (-33.333%)
+                // deltaX positive = swipe right = show prev panel = move track right
+                const percentOffset = (adjustedDelta / containerWidth) * 33.333;
+                const baseOffset = -33.333;
                 
-                // Move current content
-                holeContent.style.transform = `translateX(${adjustedDelta}px)`;
-                
-                // Move preview (it starts at 100% or -100%, so we add the delta)
-                if (swipeDirection === 'left') {
-                    preview.style.transform = `translateX(calc(100% + ${adjustedDelta}px))`;
-                } else if (swipeDirection === 'right') {
-                    preview.style.transform = `translateX(calc(-100% + ${adjustedDelta}px))`;
-                }
+                const track = document.getElementById('carouselTrack');
+                track.style.transform = `translateX(${baseOffset + percentOffset}%)`;
             }, { passive: true });
             
             swipeContainer.addEventListener('touchend', (e) => {
-                if (!isDragging || !state.currentRound || swipeAnimating) return;
+                if (!isDragging || !state.currentRound) return;
                 isDragging = false;
-                needsSync = false;
                 
-                // If no swipe direction established, this was just a tap - do nothing
-                if (swipeDirection === null) return;
-                
-                const holeContent = document.getElementById('holeContent');
-                const preview = document.getElementById('holePreview');
+                const track = document.getElementById('carouselTrack');
                 const deltaX = touchCurrentX - touchStartX;
                 
-                holeContent.classList.remove('dragging');
-                preview.classList.remove('dragging');
+                track.classList.remove('dragging');
                 
                 const shouldComplete = Math.abs(deltaX) > SWIPE_THRESHOLD;
                 
                 if (shouldComplete && swipeDirection === 'left' && currentHoleIndex < 17) {
-                    swipeAnimating = true;
+                    // Swipe left = go to next hole
+                    // Animate to next panel position
+                    track.style.transform = 'translateX(-66.666%)';
                     
-                    // Animate to final: holeContent goes left, preview comes to center
-                    holeContent.style.transform = `translateX(-100%)`;
-                    preview.style.transform = `translateX(0)`;
-                    
-                    // After animation - just update state, no visual changes needed
                     setTimeout(() => {
+                        // Trigger celebration if pending
                         if (pendingCelebration) {
                             showCelebration(pendingCelebration);
                             pendingCelebration = null;
                         }
                         
+                        // Update index
                         currentHoleIndex++;
+                        
+                        // Re-render panels and reset position instantly
+                        renderCarouselPanels();
+                        
+                        // Update other UI elements
                         updateProgressBar();
                         updateScorecard();
                         
@@ -3980,19 +3822,22 @@
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
-                        
-                        swipeAnimating = false;
-                    }, 250);
+                    }, 300);
                     
                 } else if (shouldComplete && swipeDirection === 'right' && currentHoleIndex > 0) {
-                    swipeAnimating = true;
-                    
-                    holeContent.style.transform = `translateX(100%)`;
-                    preview.style.transform = `translateX(0)`;
+                    // Swipe right = go to previous hole
+                    // Animate to prev panel position
+                    track.style.transform = 'translateX(0%)';
                     
                     setTimeout(() => {
+                        // Update index
                         currentHoleIndex--;
                         pendingCelebration = null;
+                        
+                        // Re-render panels and reset position instantly
+                        renderCarouselPanels();
+                        
+                        // Update other UI elements
                         updateProgressBar();
                         updateScorecard();
                         
@@ -4001,23 +3846,11 @@
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
-                        
-                        swipeAnimating = false;
-                    }, 250);
+                    }, 300);
                     
                 } else {
-                    // Snap back
-                    holeContent.style.transform = '';
-                    if (swipeDirection === 'left') {
-                        preview.style.transform = 'translateX(100%)';
-                    } else if (swipeDirection === 'right') {
-                        preview.style.transform = 'translateX(-100%)';
-                    }
-                    setTimeout(() => {
-                        preview.innerHTML = '';
-                        preview.classList.remove('next', 'prev');
-                        preview.style.transform = '';
-                    }, 250);
+                    // Snap back to center
+                    track.style.transform = 'translateX(-33.333%)';
                 }
                 
                 swipeDirection = null;
