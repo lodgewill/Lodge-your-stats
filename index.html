@@ -132,6 +132,7 @@
             border: 2px solid #e8e8e8;
             position: relative;
             overflow: hidden;
+            flex-shrink: 0;
         }
         .score-hero::before {
             content: '';
@@ -171,6 +172,7 @@
             gap: 10px;
             padding: 0 20px;
             margin-bottom: 16px;
+            flex-shrink: 0;
         }
         .mini-stat {
             flex: 1;
@@ -226,6 +228,7 @@
             margin: 20px 20px 12px;
             padding-bottom: 8px;
             border-bottom: 2px solid var(--masters-green);
+            flex-shrink: 0;
         }
         .section-title {
             font-size: 11px;
@@ -252,8 +255,11 @@
             background: #f8f8f8;
             border-radius: 12px;
             overflow: hidden;
+            overflow-y: auto;
             border: 1px solid #e8e8e8;
-            margin: 0 20px;
+            margin: 0 20px 16px;
+            flex: 1;
+            min-height: 0;
         }
         .recent-round-row {
             display: flex;
@@ -434,6 +440,14 @@
         /* Tabs */
         .tab { display: none; }
         .tab.active { display: block; }
+        #homeTab {
+            height: calc(100vh - 90px);
+            height: calc(100dvh - 90px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        #homeTab.active { display: flex; }
         
         /* Profile Page */
         .profile-page { display: none; padding: 0 20px; }
@@ -683,16 +697,71 @@
         .progress-info {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-top: 10px;
         }
         .progress-text {
             font-size: 12px;
             color: rgba(255,255,255,0.7);
         }
+        .progress-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
         .live-score {
             font-size: 14px;
             font-weight: 600;
             color: var(--masters-yellow);
+        }
+        
+        /* Menu Dropdown */
+        .menu-container {
+            position: relative;
+        }
+        .menu-dots {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            letter-spacing: 2px;
+        }
+        .menu-dots:active {
+            color: #fff;
+        }
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 160px;
+            z-index: 100;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .menu-dropdown.show {
+            display: block;
+        }
+        .menu-item {
+            display: block;
+            width: 100%;
+            padding: 14px 16px;
+            border: none;
+            background: none;
+            text-align: left;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--masters-red);
+            cursor: pointer;
+        }
+        .menu-item:active {
+            background: #f8f8f8;
         }
         
         /* Scorecard Expand */
@@ -1269,14 +1338,6 @@
             margin-bottom: 8px;
         }
         
-        .play-nav {
-            display: flex;
-            gap: 12px;
-            padding: 0 20px;
-            margin-bottom: 12px;
-        }
-        .play-nav .btn { flex: 1; margin: 0; }
-        
         /* Hole Content Carousel */
         .hole-swipe-container {
             position: relative;
@@ -1286,7 +1347,7 @@
             display: flex;
             width: 300%;
             transform: translateX(-33.333%);
-            transition: transform 0.2s ease-out;
+            transition: transform 0.15s ease-out;
             will-change: transform;
         }
         .carousel-track.dragging {
@@ -1604,6 +1665,18 @@
         </div>
     </div>
 
+    <!-- ==================== FINISH CONFIRMATION MODAL ==================== -->
+    <div class="modal-overlay" id="finishModal">
+        <div class="modal">
+            <div class="modal-icon">⛳</div>
+            <div class="modal-title">Would you like to submit your score?</div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeFinishModal()">No</button>
+                <button class="modal-btn primary" onclick="confirmFinishRound()">Yes</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== PROFILE PAGE ==================== -->
     <div class="profile-page" id="profilePage">
         <div class="profile-avatar" id="profileAvatar">👤</div>
@@ -1673,7 +1746,7 @@
             </div>
         </div>
         
-        <div style="margin-top:8px;">
+        <div style="margin-top:8px;flex-shrink:0;">
             <button class="btn btn-primary" onclick="startNewRound()">Start New Round</button>
         </div>
         
@@ -1712,7 +1785,15 @@
                 </div>
                 <div class="progress-info">
                     <span class="progress-text" id="progressText">Hole 1 of 18</span>
-                    <span class="live-score" id="liveScore">E</span>
+                    <div class="progress-right">
+                        <span class="live-score" id="liveScore">E</span>
+                        <div class="menu-container">
+                            <button class="menu-dots" onclick="toggleMenu(event)">•••</button>
+                            <div class="menu-dropdown" id="menuDropdown">
+                                <button class="menu-item" onclick="closeMenuAndAbandon()">Abandon Round</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -1750,19 +1831,6 @@
                     <div class="carousel-panel" id="panelNext"></div>
                 </div>
             </div>
-            
-            <!-- Navigation -->
-            <div class="play-nav">
-                <button class="btn btn-secondary" onclick="prevHole()">← Prev</button>
-                <button class="btn btn-primary" id="nextHoleBtn" onclick="nextHole()">Next →</button>
-            </div>
-            
-            <!-- Finish Round - moved lower with more spacing -->
-            <div style="height: 24px;"></div>
-            <button class="btn btn-secondary" onclick="finishRound()" style="margin-top:0;">Finish Round</button>
-            <div style="height: 12px;"></div>
-            <button class="btn btn-danger" onclick="abandonRound()" style="margin-top:0;">Abandon Round</button>
-            <div style="height: 20px;"></div>
         </div>
     </div>
 
@@ -2229,9 +2297,9 @@
             
             document.getElementById('homeBirdies').textContent = stats.birdies;
             
-            // Recent rounds
-            const recent = [...state.rounds].reverse().slice(0, 5);
-            document.getElementById('recentRoundsBadge').textContent = recent.length > 0 ? recent.length : '';
+            // Recent rounds (limited to 10, see History for more)
+            const recent = [...state.rounds].reverse().slice(0, 10);
+            document.getElementById('recentRoundsBadge').textContent = state.rounds.length > 0 ? state.rounds.length : '';
             document.getElementById('recentRounds').innerHTML = recent.length === 0 
                 ? '<div class="empty-state"><div class="empty-state-icon">⛳</div><div>Play your first round!</div></div>'
                 : recent.map((r, idx) => {
@@ -2854,6 +2922,25 @@
             if (scorecardVisible) renderScorecard();
         }
         
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('menuDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        function closeMenuAndAbandon() {
+            document.getElementById('menuDropdown').classList.remove('show');
+            abandonRound();
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('menuDropdown');
+            if (dropdown && !event.target.closest('.menu-container')) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
         function renderScorecard() {
             if (!state.currentRound) return;
             const course = state.courses.find(c => c.id === state.currentRound.courseId);
@@ -2897,16 +2984,12 @@
                 updateProgressBar();
                 updateScorecard();
                 
-                // Update next button text
-                const isEditing = editingRoundIndex !== null;
-                document.getElementById('nextHoleBtn').textContent = currentHoleIndex === 17 ? (isEditing ? 'Save →' : 'Finish →') : 'Next →';
-                
                 animationInProgress = false;
                 pendingHoleChange = null;
                 pendingAnimationTimeout = null;
                 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 200);
+            }, 150);
         }
         
         function generateScorecardHTML(round, course, playerName) {
@@ -3279,13 +3362,6 @@
                 ? `Editing: Hole ${currentHoleIndex + 1} of 18` 
                 : `Hole ${currentHoleIndex + 1} of 18`;
             
-            // Next button text
-            document.getElementById('nextHoleBtn').textContent = currentHoleIndex === 17 ? (isEditing ? 'Save →' : 'Finish →') : 'Next →';
-            
-            // Update finish/abandon button labels for editing mode
-            document.querySelector('#playActive > button.btn-secondary[onclick="finishRound()"]').textContent = isEditing ? 'Save Changes' : 'Finish Round';
-            document.querySelector('#playActive > button.btn-danger[onclick="abandonRound()"]').textContent = isEditing ? 'Discard Changes' : 'Abandon Round';
-            
             // Update scorecard if visible
             if (scorecardVisible) renderScorecard();
         }
@@ -3470,7 +3546,7 @@
                     pendingAnimationTimeout = null;
                     
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 200);
+                }, 150);
             }
         }
         
@@ -3514,7 +3590,7 @@
                     pendingAnimationTimeout = null;
                     
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 200);
+                }, 150);
             } else {
                 finishRound();
             }
@@ -3542,7 +3618,6 @@
             }
             
             const isEditing = editingRoundIndex !== null;
-            if (!confirm(isEditing ? 'Save changes to this round?' : 'Finish and save this round?')) return;
             
             let total = 0;
             state.currentRound.holes.forEach(h => total += h.score);
@@ -3570,6 +3645,19 @@
             
             // Show round summary
             showRoundSummary(finishedRound);
+        }
+        
+        function showFinishConfirmation() {
+            document.getElementById('finishModal').classList.add('show');
+        }
+        
+        function closeFinishModal() {
+            document.getElementById('finishModal').classList.remove('show');
+        }
+        
+        function confirmFinishRound() {
+            closeFinishModal();
+            finishRound();
         }
         
         function showIncompleteModal(incompleteHoles) {
@@ -3714,10 +3802,6 @@
             renderCarouselPanels();
             updateProgressBar();
             updateScorecard();
-            
-            // Update next button text
-            const isEditing = editingRoundIndex !== null;
-            document.getElementById('nextHoleBtn').textContent = currentHoleIndex === 17 ? (isEditing ? 'Save →' : 'Finish →') : 'Next →';
             
             if (scorecardVisible) {
                 scorecardVisible = false;
@@ -3924,7 +4008,21 @@
                         animationInProgress = false;
                         pendingHoleChange = null;
                         pendingAnimationTimeout = null;
-                    }, 200);
+                    }, 150);
+                    
+                } else if (shouldComplete && swipeDirection === 'left' && currentHoleIndex === 17) {
+                    // On hole 18, swiping left = show finish confirmation
+                    // Snap back to center first
+                    track.style.transform = 'translateX(-33.333%)';
+                    
+                    // Trigger celebration if pending
+                    if (pendingCelebration) {
+                        showCelebration(pendingCelebration);
+                        pendingCelebration = null;
+                    }
+                    
+                    // Show finish confirmation
+                    showFinishConfirmation();
                     
                 } else if (shouldComplete && swipeDirection === 'right' && currentHoleIndex > 0) {
                     // Swipe right = go to previous hole
@@ -3954,7 +4052,7 @@
                         animationInProgress = false;
                         pendingHoleChange = null;
                         pendingAnimationTimeout = null;
-                    }, 200);
+                    }, 150);
                     
                 } else {
                     // Snap back to center
