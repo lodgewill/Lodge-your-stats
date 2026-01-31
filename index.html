@@ -2071,7 +2071,8 @@
             }
             const hour = new Date().getHours();
             let greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-            el.textContent = `${greeting}, ${state.profile.name}`;
+            const firstName = state.profile.name.trim().split(' ')[0];
+            el.textContent = `${greeting}, ${firstName}`;
         }
         
         function updateProfileBtn() {
