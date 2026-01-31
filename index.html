@@ -1286,7 +1286,7 @@
             display: flex;
             width: 300%;
             transform: translateX(-33.333%);
-            transition: transform 0.3s ease-out;
+            transition: transform 0.2s ease-out;
             will-change: transform;
         }
         .carousel-track.dragging {
@@ -2875,13 +2875,22 @@
             const targetIndex = holeNum - 1;
             if (targetIndex === currentHoleIndex) return;
             
+            // Complete any pending animation immediately
+            if (animationInProgress) {
+                completePendingAnimation();
+            }
+            
             const track = document.getElementById('carouselTrack');
             const goingForward = targetIndex > currentHoleIndex;
             
             // Animate in the direction of travel
             track.style.transform = `translateX(${goingForward ? '-66.666%' : '0%'})`;
             
-            setTimeout(() => {
+            // Set up pending animation
+            animationInProgress = true;
+            pendingHoleChange = { direction: targetIndex, celebration: null };
+            
+            pendingAnimationTimeout = setTimeout(() => {
                 currentHoleIndex = targetIndex;
                 pendingCelebration = null;
                 renderCarouselPanels();
@@ -2892,8 +2901,12 @@
                 const isEditing = editingRoundIndex !== null;
                 document.getElementById('nextHoleBtn').textContent = currentHoleIndex === 17 ? (isEditing ? 'Save →' : 'Finish →') : 'Next →';
                 
+                animationInProgress = false;
+                pendingHoleChange = null;
+                pendingAnimationTimeout = null;
+                
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 300);
+            }, 200);
         }
         
         function generateScorecardHTML(round, course, playerName) {
@@ -3424,12 +3437,21 @@
         
         function prevHole() {
             if (currentHoleIndex > 0) {
+                // Complete any pending animation immediately
+                if (animationInProgress) {
+                    completePendingAnimation();
+                }
+                
                 const track = document.getElementById('carouselTrack');
                 
                 // Animate to previous panel (slide right to show prev panel)
                 track.style.transform = 'translateX(0%)';
                 
-                setTimeout(() => {
+                // Set up pending animation
+                animationInProgress = true;
+                pendingHoleChange = { direction: 'prev', celebration: null };
+                
+                pendingAnimationTimeout = setTimeout(() => {
                     currentHoleIndex--;
                     pendingCelebration = null;
                     if (scorecardVisible) {
@@ -3443,12 +3465,21 @@
                     updateProgressBar();
                     updateScorecard();
                     
+                    animationInProgress = false;
+                    pendingHoleChange = null;
+                    pendingAnimationTimeout = null;
+                    
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 300);
+                }, 200);
             }
         }
         
         function nextHole() {
+            // Complete any pending animation immediately
+            if (animationInProgress) {
+                completePendingAnimation();
+            }
+            
             // Trigger celebration if pending
             if (pendingCelebration) {
                 showCelebration(pendingCelebration);
@@ -3461,7 +3492,11 @@
                 // Animate to next panel (slide left to show next panel)
                 track.style.transform = 'translateX(-66.666%)';
                 
-                setTimeout(() => {
+                // Set up pending animation
+                animationInProgress = true;
+                pendingHoleChange = { direction: 'next', celebration: null };
+                
+                pendingAnimationTimeout = setTimeout(() => {
                     currentHoleIndex++;
                     if (scorecardVisible) {
                         scorecardVisible = false;
@@ -3474,8 +3509,12 @@
                     updateProgressBar();
                     updateScorecard();
                     
+                    animationInProgress = false;
+                    pendingHoleChange = null;
+                    pendingAnimationTimeout = null;
+                    
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 300);
+                }, 200);
             } else {
                 finishRound();
             }
@@ -3640,6 +3679,57 @@
         let swipeDirection = null;
         const SWIPE_THRESHOLD = 20;
         
+        // Animation interruption support
+        let animationInProgress = false;
+        let pendingAnimationTimeout = null;
+        let pendingHoleChange = null;
+        
+        function completePendingAnimation() {
+            if (!animationInProgress || !pendingHoleChange) return;
+            
+            // Clear the pending timeout
+            if (pendingAnimationTimeout) {
+                clearTimeout(pendingAnimationTimeout);
+                pendingAnimationTimeout = null;
+            }
+            
+            // Immediately apply the pending hole change
+            const { direction, celebration } = pendingHoleChange;
+            
+            if (celebration) {
+                showCelebration(celebration);
+            }
+            
+            if (direction === 'next') {
+                currentHoleIndex++;
+            } else if (direction === 'prev') {
+                currentHoleIndex--;
+            } else if (typeof direction === 'number') {
+                currentHoleIndex = direction;
+            }
+            
+            pendingCelebration = null;
+            
+            // Re-render panels instantly
+            renderCarouselPanels();
+            updateProgressBar();
+            updateScorecard();
+            
+            // Update next button text
+            const isEditing = editingRoundIndex !== null;
+            document.getElementById('nextHoleBtn').textContent = currentHoleIndex === 17 ? (isEditing ? 'Save →' : 'Finish →') : 'Next →';
+            
+            if (scorecardVisible) {
+                scorecardVisible = false;
+                document.getElementById('scorecardContainer').classList.remove('show');
+                document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
+            }
+            
+            // Reset animation state
+            animationInProgress = false;
+            pendingHoleChange = null;
+        }
+        
         function generateHoleContentHTML(holeIndex) {
             if (!state.currentRound || holeIndex < 0 || holeIndex > 17) return '';
             const hole = state.currentRound.holes[holeIndex];
@@ -3748,6 +3838,12 @@
             
             swipeContainer.addEventListener('touchstart', (e) => {
                 if (!state.currentRound) return;
+                
+                // Complete any pending animation immediately
+                if (animationInProgress) {
+                    completePendingAnimation();
+                }
+                
                 touchStartX = e.touches[0].clientX;
                 touchCurrentX = touchStartX;
                 isDragging = true;
@@ -3798,23 +3894,24 @@
                 
                 if (shouldComplete && swipeDirection === 'left' && currentHoleIndex < 17) {
                     // Swipe left = go to next hole
-                    // Animate to next panel position
                     track.style.transform = 'translateX(-66.666%)';
                     
-                    setTimeout(() => {
-                        // Trigger celebration if pending
-                        if (pendingCelebration) {
-                            showCelebration(pendingCelebration);
-                            pendingCelebration = null;
+                    // Set up pending animation
+                    animationInProgress = true;
+                    pendingHoleChange = { 
+                        direction: 'next', 
+                        celebration: pendingCelebration 
+                    };
+                    
+                    pendingAnimationTimeout = setTimeout(() => {
+                        if (pendingHoleChange && pendingHoleChange.celebration) {
+                            showCelebration(pendingHoleChange.celebration);
                         }
                         
-                        // Update index
                         currentHoleIndex++;
+                        pendingCelebration = null;
                         
-                        // Re-render panels and reset position instantly
                         renderCarouselPanels();
-                        
-                        // Update other UI elements
                         updateProgressBar();
                         updateScorecard();
                         
@@ -3823,22 +3920,28 @@
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
-                    }, 300);
+                        
+                        animationInProgress = false;
+                        pendingHoleChange = null;
+                        pendingAnimationTimeout = null;
+                    }, 200);
                     
                 } else if (shouldComplete && swipeDirection === 'right' && currentHoleIndex > 0) {
                     // Swipe right = go to previous hole
-                    // Animate to prev panel position
                     track.style.transform = 'translateX(0%)';
                     
-                    setTimeout(() => {
-                        // Update index
+                    // Set up pending animation
+                    animationInProgress = true;
+                    pendingHoleChange = { 
+                        direction: 'prev', 
+                        celebration: null 
+                    };
+                    
+                    pendingAnimationTimeout = setTimeout(() => {
                         currentHoleIndex--;
                         pendingCelebration = null;
                         
-                        // Re-render panels and reset position instantly
                         renderCarouselPanels();
-                        
-                        // Update other UI elements
                         updateProgressBar();
                         updateScorecard();
                         
@@ -3847,7 +3950,11 @@
                             document.getElementById('scorecardContainer').classList.remove('show');
                             document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
                         }
-                    }, 300);
+                        
+                        animationInProgress = false;
+                        pendingHoleChange = null;
+                        pendingAnimationTimeout = null;
+                    }, 200);
                     
                 } else {
                     // Snap back to center
