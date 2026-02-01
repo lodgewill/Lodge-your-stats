@@ -1686,6 +1686,7 @@
             overflow-y: auto;
             height: auto;
             max-height: none;
+            padding-bottom: 20px;
         }
         #playActive.scorecard-open .hole-swipe-container {
             flex: none;
@@ -1710,9 +1711,10 @@
         
         /* Compact layout for small screens */
         @media (max-height: 799px) {
-            /* Adjust score input to match grid padding */
+            /* Adjust score input to match stats-container alignment */
             .score-input {
                 margin: 0 16px 8px;
+                border-radius: 10px;
             }
             
             .stats-container {
@@ -1793,22 +1795,22 @@
             
             /* Compact gettable counters */
             .stats-container .stat-gettable .counter-row {
-                padding: 4px 0;
+                padding: 6px 0;
             }
             .stats-container .stat-gettable .counter-label {
                 font-size: 11px;
             }
             .stats-container .stat-gettable .counter-controls {
-                gap: 6px;
+                gap: 8px;
             }
             .stats-container .stat-gettable .counter-btn {
-                width: 26px;
-                height: 26px;
-                font-size: 14px;
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
             }
             .stats-container .stat-gettable .counter-value {
-                font-size: 14px;
-                min-width: 20px;
+                font-size: 18px;
+                min-width: 24px;
             }
             
             /* Compact up & down */
@@ -1863,6 +1865,14 @@
             .stats-container .conditional-section {
                 display: none !important;
             }
+            
+            /* Compact scorecard label text */
+            .classic-scorecard .label-cell {
+                font-size: 11px !important;
+                width: 44px !important;
+                min-width: 44px !important;
+                padding-left: 4px !important;
+            }
         }
         
         /* Large screens: Show putting-row and full updown, hide compact cards */
@@ -1905,7 +1915,7 @@
             }
             .score-input {
                 padding: 12px;
-                margin: 0 20px 8px;
+                margin: 0 16px 8px;
                 gap: 20px;
             }
             .score-btn {
@@ -1988,7 +1998,7 @@
                 padding: 10px;
                 margin: 0 16px 6px;
                 gap: 16px;
-                border-radius: 12px;
+                border-radius: 10px;
             }
             .score-btn {
                 width: 44px;
@@ -4451,7 +4461,7 @@
                     
                     <!-- Gettable Card (compact - shown on small screens) -->
                     <div class="stat-card stat-gettable">
-                        <div class="stat-card-title">Gettable <span class="stat-card-subtitle">(4-12ft)</span></div>
+                        <div class="stat-card-title">Gettable Putts <span class="stat-card-subtitle">(4-12ft)</span></div>
                         <div class="counter-row">
                             <span class="counter-label">Made</span>
                             <div class="counter-controls">
