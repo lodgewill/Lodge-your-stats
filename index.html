@@ -40,6 +40,14 @@
             -webkit-font-smoothing: antialiased;
         }
         
+        /* Prevent body scroll when Play tab is active (scorecard closed) */
+        body.play-active {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        
         /* Header */
         .header {
             padding: 16px 20px 16px;
@@ -1252,7 +1260,7 @@
         }
         .yes-no-btn.single {
             flex: 0 0 auto;
-            padding: 10px 20px;
+            padding: 10px 40px;
         }
         
         /* Putts Row */
@@ -1661,7 +1669,7 @@
         }
         .up-down-made .yes-no-btn {
             flex: 0 0 auto;
-            padding: 10px 20px;
+            padding: 10px 40px;
         }
         
         /* Play active view - fixed by default */
@@ -1685,6 +1693,193 @@
         #playActive.scorecard-open .carousel-track,
         #playActive.scorecard-open .carousel-panel {
             min-height: auto;
+        }
+        
+        /* ==================== STATS CONTAINER - Responsive Layout ==================== */
+        /* Default: Stacked layout for large screens */
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .stats-container .stat-card {
+            margin: 0 20px 8px;
+        }
+        .stats-container .putting-row {
+            margin-bottom: 8px;
+        }
+        
+        /* Compact layout for small screens */
+        @media (max-height: 799px) {
+            /* Adjust score input to match grid padding */
+            .score-input {
+                margin: 0 16px 8px;
+            }
+            
+            .stats-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-areas:
+                    "fairway putts"
+                    "updown gettable"
+                    "updown-details updown-details";
+                gap: 8px;
+                padding: 0 16px;
+            }
+            .stats-container .stat-card {
+                margin: 0;
+                padding: 10px 12px;
+                border-radius: 10px;
+            }
+            .stats-container .stat-fairway {
+                grid-area: fairway;
+            }
+            .stats-container .stat-putts {
+                grid-area: putts;
+            }
+            .stats-container .stat-updown {
+                grid-area: updown;
+            }
+            .stats-container .stat-gettable {
+                grid-area: gettable;
+            }
+            .stats-container .stat-updown-details {
+                grid-area: updown-details;
+            }
+            .stats-container .stat-updown-details:not(.show) {
+                display: none;
+            }
+            
+            /* Hide the stacked-only putting-row on small screens */
+            .stats-container .putting-row {
+                display: none;
+            }
+            
+            /* Compact stat card title */
+            .stats-container .stat-card-title {
+                font-size: 10px;
+                margin-bottom: 8px;
+            }
+            .stats-container .stat-card-subtitle {
+                font-size: 9px;
+            }
+            
+            /* Compact yes/no buttons */
+            .stats-container .yes-no-row {
+                gap: 6px;
+            }
+            .stats-container .yes-no-btn {
+                padding: 8px 6px;
+                font-size: 11px;
+                border-radius: 6px;
+            }
+            .stats-container .yes-no-btn.single {
+                padding: 8px 16px;
+            }
+            
+            /* Compact putts counter */
+            .stats-container .stat-putts .counter-controls {
+                justify-content: center;
+                gap: 8px;
+            }
+            .stats-container .stat-putts .counter-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+            .stats-container .stat-putts .counter-value {
+                font-size: 18px;
+                min-width: 24px;
+            }
+            
+            /* Compact gettable counters */
+            .stats-container .stat-gettable .counter-row {
+                padding: 4px 0;
+            }
+            .stats-container .stat-gettable .counter-label {
+                font-size: 11px;
+            }
+            .stats-container .stat-gettable .counter-controls {
+                gap: 6px;
+            }
+            .stats-container .stat-gettable .counter-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 14px;
+            }
+            .stats-container .stat-gettable .counter-value {
+                font-size: 14px;
+                min-width: 20px;
+            }
+            
+            /* Compact up & down */
+            .stats-container .stat-updown .sub-option-label {
+                font-size: 10px;
+                margin-bottom: 6px;
+            }
+            /* Up & Down attempt - single button should be half width */
+            .stats-container .stat-updown .yes-no-btn {
+                flex: 0 0 calc(50% - 3px);
+            }
+            
+            /* Up & Down details - horizontal layout on small screens */
+            .stats-container .stat-updown-details .updown-details-inner {
+                display: flex;
+                gap: 16px;
+                justify-content: space-between;
+                align-items: flex-end;
+            }
+            .stats-container .stat-updown-details .updown-made-section {
+                flex: 1;
+            }
+            .stats-container .stat-updown-details .bunker-section {
+                flex: 1;
+                text-align: right;
+            }
+            .stats-container .stat-updown-details .sub-option-label {
+                font-size: 10px;
+                margin-bottom: 6px;
+            }
+            .stats-container .stat-updown-details .yes-no-row {
+                gap: 6px;
+            }
+            /* Up & Down made buttons - same as Fairway (flex:1 each) */
+            .stats-container .stat-updown-details .updown-made-section .yes-no-btn {
+                padding: 8px 6px;
+                font-size: 11px;
+                flex: 1;
+            }
+            /* From bunker button - half width to match single Fairway button size */
+            .stats-container .stat-updown-details .bunker-section .yes-no-row {
+                justify-content: flex-end;
+            }
+            .stats-container .stat-updown-details .bunker-section .yes-no-btn {
+                padding: 8px 6px;
+                font-size: 11px;
+                flex: 0 0 calc(50% - 3px);
+            }
+            
+            /* Hide original up-down-row and conditional-section on small screens */
+            .stats-container .up-down-row,
+            .stats-container .conditional-section {
+                display: none !important;
+            }
+        }
+        
+        /* Large screens: Show putting-row and full updown, hide compact cards */
+        @media (min-height: 800px) {
+            .stats-container .stat-putts,
+            .stats-container .stat-gettable,
+            .stats-container .stat-updown,
+            .stats-container .stat-updown-details {
+                display: none !important;
+            }
+        }
+        
+        /* Small screens: Hide the full updown card */
+        @media (max-height: 799px) {
+            .stats-container .stat-updown-full {
+                display: none !important;
+            }
         }
         
         /* ==================== RESPONSIVE: Medium height screens (iPhone 13/14/15) ==================== */
@@ -2320,61 +2515,6 @@
             editingRoundIndex: null
         };
         
-        // Generate test rounds for scroll testing
-        function generateTestRounds() {
-            const testRounds = [];
-            const courseIds = [1, 2, 3];
-            const coursePars = {
-                1: [4,4,4,3,4,4,3,4,5,4,3,4,3,4,5,5,4,4],
-                2: [4,5,4,3,5,4,4,3,4,4,5,3,4,3,4,4,5,4],
-                3: [4,5,4,3,4,4,5,3,4,4,5,4,3,4,4,4,3,5]
-            };
-            
-            for (let i = 0; i < 12; i++) {
-                const courseId = courseIds[i % 3];
-                const pars = coursePars[courseId];
-                const date = new Date();
-                date.setDate(date.getDate() - (i * 7)); // Each round 1 week apart
-                
-                const holes = pars.map((par, holeIdx) => {
-                    // Generate realistic scores: mostly par, some bogeys, occasional birdies
-                    const rand = Math.random();
-                    let score;
-                    if (rand < 0.15) score = par - 1; // 15% birdie
-                    else if (rand < 0.55) score = par; // 40% par
-                    else if (rand < 0.85) score = par + 1; // 30% bogey
-                    else score = par + 2; // 15% double
-                    
-                    const isPar3 = par === 3;
-                    const fairway = isPar3 ? null : (Math.random() < 0.6 ? 'yes' : 'no');
-                    const gir = Math.random() < 0.45;
-                    const putts = gir ? (Math.random() < 0.7 ? 2 : (Math.random() < 0.5 ? 1 : 3)) : (Math.random() < 0.6 ? 2 : 3);
-                    
-                    return {
-                        score: score,
-                        par: par,
-                        fairway: fairway,
-                        gir: gir,
-                        putts: putts,
-                        gettableTotal: (!gir && Math.random() < 0.3) ? 1 : 0,
-                        gettableMade: 0,
-                        upDownAttempt: !gir,
-                        upDownMade: !gir ? (Math.random() < 0.4 ? true : false) : null,
-                        fromBunker: Math.random() < 0.15
-                    };
-                });
-                
-                testRounds.push({
-                    id: Date.now() - (i * 86400000),
-                    courseId: courseId,
-                    date: date.toISOString(),
-                    holes: holes
-                });
-            }
-            
-            return testRounds;
-        }
-        
         let currentHoleIndex = 0;
         let currentFilter = '3m';
         let scorecardVisible = false;
@@ -2389,6 +2529,12 @@
                 { id: 2, name: 'Rosebud 🐐 (South)', pars: [4,5,4,3,5,4,4,3,4,4,5,3,4,3,4,4,5,4] },
                 { id: 3, name: 'Yas Links', pars: [4,5,4,3,4,4,5,3,4,4,5,4,3,4,4,4,3,5] }
             ];
+            
+            // One-time cleanup of test/sample data
+            if (!localStorage.getItem('testDataCleared_v32')) {
+                localStorage.removeItem('golfStatsAppV2');
+                localStorage.setItem('testDataCleared_v32', 'true');
+            }
             
             try {
                 const saved = localStorage.getItem('golfStatsAppV2');
@@ -2428,12 +2574,6 @@
                     saveState();
                 }
             } catch (e) { console.error('Load error:', e); }
-            
-            // TESTING: Add 12 fake rounds if none exist (remove this block after testing)
-            if (state.rounds.length === 0) {
-                state.rounds = generateTestRounds();
-                saveState();
-            }
             
             // Request persistent storage
             if (navigator.storage && navigator.storage.persist) {
@@ -2617,6 +2757,13 @@
             }
             
             updateRoundBanner(tabId);
+            
+            // Control body scroll - only lock when Play tab is active with a round and scorecard is closed
+            if (tabId === 'playTab' && state.currentRound && !scorecardVisible) {
+                document.body.classList.add('play-active');
+            } else {
+                document.body.classList.remove('play-active');
+            }
             
             if (tabId === 'homeTab') updateHomeTab();
             if (tabId === 'statsTab') updateStatsTab();
@@ -3245,6 +3392,7 @@
                 document.getElementById('playSetup').style.display = 'block';
                 document.getElementById('playActive').style.display = 'none';
                 document.getElementById('mainHeader').style.display = 'block';
+                document.body.classList.remove('play-active');
             } else {
                 document.getElementById('playSetup').style.display = 'none';
                 document.getElementById('playActive').style.display = 'flex';
@@ -3252,6 +3400,10 @@
                 renderScorecard();
                 renderCurrentHole();
                 updateLiveScore();
+                // Lock body scroll when round is active and scorecard is closed
+                if (!scorecardVisible) {
+                    document.body.classList.add('play-active');
+                }
             }
         }
         
@@ -3305,7 +3457,14 @@
             document.getElementById('playActive').classList.toggle('scorecard-open', scorecardVisible);
             document.getElementById('playTab').classList.toggle('scorecard-open', scorecardVisible);
             document.getElementById('scorecardToggleBtn').textContent = scorecardVisible ? 'Hide Scorecard' : 'View Scorecard';
-            if (scorecardVisible) renderScorecard();
+            
+            // Control body scroll - unlock when scorecard is open, lock when closed
+            if (scorecardVisible) {
+                document.body.classList.remove('play-active');
+                renderScorecard();
+            } else {
+                document.body.classList.add('play-active');
+            }
         }
         
         function toggleMenu(event) {
@@ -4128,6 +4287,9 @@
             document.getElementById('mainHeader').style.display = 'none';
             document.getElementById('roundBanner').classList.remove('show');
             document.getElementById('roundSummary').classList.add('active');
+            
+            // Allow scrolling on summary page
+            document.body.classList.remove('play-active');
         }
         
         function closeSummary() {
@@ -4258,27 +4420,38 @@
                     <button class="score-btn" onclick="adjustScore(1)">+</button>
                 </div>
                 
-                <div class="stat-card" style="${showFairway ? '' : 'display:none;'}">
-                    <div class="stat-card-title">Fairway Hit?</div>
-                    <div class="yes-no-row">
-                        <button class="yes-no-btn ${fairwayYesClass}" onclick="setFairway(true)">Yes</button>
-                        <button class="yes-no-btn ${fairwayNoClass}" onclick="setFairway(false)">No</button>
-                    </div>
-                </div>
-                
-                <div class="putting-row">
-                    <div class="stat-card putting-card-small" style="display:flex;flex-direction:column;">
-                        <div class="stat-card-title">Putts</div>
-                        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
-                            <div class="counter-controls">
-                                <button class="counter-btn" onclick="adjustPutts(-1)">−</button>
-                                <span class="counter-value">${hole.putts || 0}</span>
-                                <button class="counter-btn" onclick="adjustPutts(1)">+</button>
-                            </div>
+                <div class="stats-container">
+                    <!-- Fairway Card -->
+                    <div class="stat-card stat-fairway" style="${showFairway ? '' : 'display:none;'}">
+                        <div class="stat-card-title">Fairway Hit?</div>
+                        <div class="yes-no-row">
+                            <button class="yes-no-btn ${fairwayYesClass}" onclick="setFairway(true)">Yes</button>
+                            <button class="yes-no-btn ${fairwayNoClass}" onclick="setFairway(false)">No</button>
                         </div>
                     </div>
-                    <div class="stat-card putting-card-large">
-                        <div class="stat-card-title">Gettable Putts <span class="stat-card-subtitle">(4-12ft)</span></div>
+                    
+                    <!-- Putts Card (compact - shown on small screens) -->
+                    <div class="stat-card stat-putts">
+                        <div class="stat-card-title">Putts</div>
+                        <div class="counter-controls">
+                            <button class="counter-btn" onclick="adjustPutts(-1)">−</button>
+                            <span class="counter-value">${hole.putts || 0}</span>
+                            <button class="counter-btn" onclick="adjustPutts(1)">+</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Up & Down Attempt Card (compact - shown on small screens) -->
+                    <div class="stat-card stat-updown">
+                        <div class="stat-card-title">Up & Down <span class="stat-card-subtitle">(&lt;15m)</span></div>
+                        <div class="sub-option-label">Attempt?</div>
+                        <div class="yes-no-row">
+                            <button class="yes-no-btn ${upDownAttemptClass}" onclick="toggleUpDownAttempt()">Yes</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Gettable Card (compact - shown on small screens) -->
+                    <div class="stat-card stat-gettable">
+                        <div class="stat-card-title">Gettable <span class="stat-card-subtitle">(4-12ft)</span></div>
                         <div class="counter-row">
                             <span class="counter-label">Made</span>
                             <div class="counter-controls">
@@ -4288,7 +4461,7 @@
                             </div>
                         </div>
                         <div class="counter-row">
-                            <span class="counter-label">Total attempts</span>
+                            <span class="counter-label">Total</span>
                             <div class="counter-controls">
                                 <button class="counter-btn" onclick="adjustGettableTotal(-1)">−</button>
                                 <span class="counter-value">${hole.gettableTotal || 0}</span>
@@ -4296,27 +4469,80 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-card-title">Up & Down <span class="stat-card-subtitle">(&lt;15m from green)</span></div>
-                    <div class="up-down-row">
-                        <div class="up-down-attempt">
-                            <div class="sub-option-label">Up & Down attempt?</div>
-                            <button class="yes-no-btn single ${upDownAttemptClass}" onclick="toggleUpDownAttempt()">Yes</button>
-                        </div>
-                        <div class="up-down-made ${upDownDetailsShow}">
-                            <div class="sub-option-label">Up & Down made?</div>
-                            <div class="yes-no-row">
-                                <button class="yes-no-btn ${upDownMadeYesClass}" onclick="setUpDownMade(true)">Yes</button>
-                                <button class="yes-no-btn ${upDownMadeNoClass}" onclick="setUpDownMade(false)">No</button>
+                    
+                    <!-- Up & Down Details Card (compact - shown on small screens when attempt=yes) -->
+                    <div class="stat-card stat-updown-details ${upDownDetailsShow}">
+                        <div class="updown-details-inner">
+                            <div class="updown-made-section">
+                                <div class="sub-option-label">Up & Down made?</div>
+                                <div class="yes-no-row">
+                                    <button class="yes-no-btn ${upDownMadeYesClass}" onclick="setUpDownMade(true)">Yes</button>
+                                    <button class="yes-no-btn ${upDownMadeNoClass}" onclick="setUpDownMade(false)">No</button>
+                                </div>
+                            </div>
+                            <div class="bunker-section">
+                                <div class="sub-option-label">From bunker?</div>
+                                <div class="yes-no-row">
+                                    <button class="yes-no-btn ${fromBunkerClass}" onclick="setFromBunker()">Yes</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="conditional-section ${upDownDetailsShow}">
-                        <div class="sub-option">
-                            <div class="sub-option-label">From bunker?</div>
-                            <button class="yes-no-btn single ${fromBunkerClass}" onclick="setFromBunker()">Yes</button>
+                    
+                    <!-- Original Putting Row (shown on large screens) -->
+                    <div class="putting-row">
+                        <div class="stat-card putting-card-small" style="display:flex;flex-direction:column;">
+                            <div class="stat-card-title">Putts</div>
+                            <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+                                <div class="counter-controls">
+                                    <button class="counter-btn" onclick="adjustPutts(-1)">−</button>
+                                    <span class="counter-value">${hole.putts || 0}</span>
+                                    <button class="counter-btn" onclick="adjustPutts(1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card putting-card-large">
+                            <div class="stat-card-title">Gettable Putts <span class="stat-card-subtitle">(4-12ft)</span></div>
+                            <div class="counter-row">
+                                <span class="counter-label">Made</span>
+                                <div class="counter-controls">
+                                    <button class="counter-btn" onclick="adjustGettableMade(-1)">−</button>
+                                    <span class="counter-value">${hole.gettableMade || 0}</span>
+                                    <button class="counter-btn" onclick="adjustGettableMade(1)">+</button>
+                                </div>
+                            </div>
+                            <div class="counter-row">
+                                <span class="counter-label">Total attempts</span>
+                                <div class="counter-controls">
+                                    <button class="counter-btn" onclick="adjustGettableTotal(-1)">−</button>
+                                    <span class="counter-value">${hole.gettableTotal || 0}</span>
+                                    <button class="counter-btn" onclick="adjustGettableTotal(1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Original Up & Down Card (shown on large screens) -->
+                    <div class="stat-card stat-updown-full">
+                        <div class="stat-card-title">Up & Down <span class="stat-card-subtitle">(&lt;15m from green)</span></div>
+                        <div class="up-down-row">
+                            <div class="up-down-attempt">
+                                <div class="sub-option-label">Up & Down attempt?</div>
+                                <button class="yes-no-btn single ${upDownAttemptClass}" onclick="toggleUpDownAttempt()">Yes</button>
+                            </div>
+                            <div class="up-down-made ${upDownDetailsShow}">
+                                <div class="sub-option-label">Up & Down made?</div>
+                                <div class="yes-no-row">
+                                    <button class="yes-no-btn ${upDownMadeYesClass}" onclick="setUpDownMade(true)">Yes</button>
+                                    <button class="yes-no-btn ${upDownMadeNoClass}" onclick="setUpDownMade(false)">No</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="conditional-section ${upDownDetailsShow}">
+                            <div class="sub-option">
+                                <div class="sub-option-label">From bunker?</div>
+                                <button class="yes-no-btn single ${fromBunkerClass}" onclick="setFromBunker()">Yes</button>
+                            </div>
                         </div>
                     </div>
                 </div>
