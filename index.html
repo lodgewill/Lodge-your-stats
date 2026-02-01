@@ -1873,6 +1873,17 @@
                 min-width: 40px !important;
                 padding-left: 3px !important;
             }
+            /* Compact OUT/IN/TOT text */
+            .classic-scorecard .total-cell {
+                font-size: 8px !important;
+                width: 22px !important;
+                min-width: 22px !important;
+                padding: 1px 0 !important;
+            }
+            /* More specific rule to override header total-cell font-size */
+            .classic-scorecard .hole-header .total-cell {
+                font-size: 7px !important;
+            }
         }
         
         /* Large screens: Show putting-row and full updown, hide compact cards */
@@ -2365,9 +2376,8 @@
         </div>
         
         <div class="filter-row">
-            <div class="pill active" data-filter="3m" onclick="setFilter('3m')">3 Months</div>
             <div class="pill" data-filter="6m" onclick="setFilter('6m')">6 Months</div>
-            <div class="pill" data-filter="1y" onclick="setFilter('1y')">Year</div>
+            <div class="pill active" data-filter="1y" onclick="setFilter('1y')">Year</div>
             <div class="pill" data-filter="all" onclick="setFilter('all')">All Time</div>
             <div class="pill" data-filter="custom" onclick="setFilter('custom')">Custom</div>
         </div>
@@ -2526,7 +2536,7 @@
         };
         
         let currentHoleIndex = 0;
-        let currentFilter = '3m';
+        let currentFilter = '1y';
         let scorecardVisible = false;
         let pendingCelebration = null;
         let finishAttempted = false;
@@ -2986,7 +2996,6 @@
             }
             
             switch (currentFilter) {
-                case '3m': fromDate = new Date(now.setMonth(now.getMonth() - 3)); break;
                 case '6m': fromDate = new Date(now.setMonth(now.getMonth() - 6)); break;
                 case '1y': fromDate = new Date(now.setFullYear(now.getFullYear() - 1)); break;
                 default: return state.rounds;
