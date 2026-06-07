@@ -1522,7 +1522,29 @@
         .modal-btn:active {
             transform: scale(0.98);
         }
-        
+
+        /* "Day for it" round-start splash */
+        .day-modal {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 22px 26px;
+        }
+        .day-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+        .day-text {
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
         /* Round Summary */
         .round-summary {
             display: none;

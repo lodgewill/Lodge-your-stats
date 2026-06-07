@@ -1,4 +1,4 @@
-const CACHE_NAME = 'golf-stats-v39';
+const CACHE_NAME = 'golf-stats-v40';
 const urlsToCache = [
   './',
   './index.html',
@@ -9,7 +9,8 @@ const urlsToCache = [
   './icon-192.png',
   './icon-512.png',
   './birdie.mp3',
-  './eagle.mp3'
+  './eagle.mp3',
+  './jason-day.png'
 ];
 
 self.addEventListener('install', event => {

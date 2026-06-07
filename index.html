@@ -36,15 +36,11 @@
         <button class="continue-scoring-btn" onclick="continueScoring()">Continue scoring →</button>
     </div>
 
-    <!-- ==================== FUNNY MODAL ==================== -->
-    <div class="modal-overlay" id="funnyModal">
-        <div class="modal" role="dialog" aria-modal="true" aria-label="Start round confirmation">
-            <div class="modal-icon">🏌️‍♂️</div>
-            <div class="modal-title">Do you agree Will Lodge is a much better golfer than you?<br><br>To accept and continue scoring, select 'Yes'</div>
-            <div class="modal-buttons">
-                <button class="modal-btn" onclick="closeFunnyModal()">No</button>
-                <button class="modal-btn primary" onclick="acceptAndStartRound()">Yes</button>
-            </div>
+    <!-- ==================== ROUND-START SPLASH ("Day for it") ==================== -->
+    <div class="modal-overlay" id="funnyModal" onclick="acceptAndStartRound()">
+        <div class="modal day-modal" role="dialog" aria-modal="true" aria-label="Starting round">
+            <img src="jason-day.png" alt="Jason Day" class="day-img">
+            <span class="day-text">for it.</span>
         </div>
     </div>
 

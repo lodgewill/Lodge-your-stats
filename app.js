@@ -255,17 +255,25 @@
         }
         
         // ==================== FUNNY MODAL ====================
+        let funnyModalTimer = null;
+
         function showFunnyModal() {
             const m = document.getElementById('funnyModal');
             m.classList.add('show');
-            m.querySelector('.modal-btn.primary').focus();
+            // Auto-dismiss splash, then start the round. (Tapping it skips the wait.)
+            clearTimeout(funnyModalTimer);
+            funnyModalTimer = setTimeout(acceptAndStartRound, 2000);
         }
-        
+
         function closeFunnyModal() {
+            clearTimeout(funnyModalTimer);
             document.getElementById('funnyModal').classList.remove('show');
         }
-        
+
         function acceptAndStartRound() {
+            const m = document.getElementById('funnyModal');
+            // Guard against double-firing (auto-dismiss timer + a tap to skip)
+            if (!m.classList.contains('show')) return;
             closeFunnyModal();
             // If we're already on Play tab with a course selected, begin the round
             const courseSelect = document.getElementById('courseSelect');
