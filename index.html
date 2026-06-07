@@ -1624,6 +1624,13 @@
             opacity: 0.5;
         }
         .course-delete:hover { opacity: 1; }
+        .course-actions { display: flex; align-items: center; gap: 4px; }
+        .course-edit {
+            padding: 8px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+        .course-edit:hover { opacity: 1; }
         
         /* History Detail */
         .history-detail {
@@ -2473,14 +2480,14 @@
         </div>
         
         <div class="setup-card">
-            <div class="setup-card-title">Add New Course</div>
+            <div class="setup-card-title" id="courseFormTitle">Add New Course</div>
             <div class="form-group" style="margin-bottom:16px;">
                 <input type="text" class="form-input" id="newCourseName" placeholder="Course name">
             </div>
             <div class="form-group" style="margin-bottom:16px;">
                 <input type="text" class="form-input" id="newCoursePars" placeholder="Pars (e.g., 4,3,5,4,4,3,4,5,4...)">
             </div>
-            <button class="btn btn-primary" onclick="addCourse()" style="width:100%;margin:0;">Add Course</button>
+            <button class="btn btn-primary" id="courseFormBtn" onclick="addCourse()" style="width:100%;margin:0;">Add Course</button>
         </div>
         
         <div class="section-header" style="margin-top:8px;">
@@ -2543,6 +2550,7 @@
         let pendingCelebration = null;
         let finishAttempted = false;
         let editingRoundIndex = null;
+        let editingCourseId = null;
 
         // ==================== UTILITIES ====================
         // Escape user-entered text before putting it into the page as HTML,
@@ -2555,6 +2563,17 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
+        }
+
+        // Total par for a round, taken from the pars actually played (stored on
+        // each hole). This keeps past rounds correct even if the course is later
+        // edited or deleted, and avoids the old "deleted course shows par 72" bug.
+        function getRoundPar(round) {
+            if (round && Array.isArray(round.holes) && round.holes.length) {
+                return round.holes.reduce((sum, h) => sum + (h.par || 0), 0);
+            }
+            const course = round && state.courses.find(c => c.id === round.courseId);
+            return course ? course.pars.reduce((a, b) => a + b, 0) : 72;
         }
 
         // ==================== STORAGE ====================
@@ -2870,7 +2889,7 @@
             document.getElementById('homeScore').textContent = lastRound.totalScore || '--';
             
             const course = state.courses.find(c => c.id === lastRound.courseId);
-            const coursePar = course ? course.pars.reduce((a,b) => a+b, 0) : 72;
+            const coursePar = getRoundPar(lastRound);
             const toPar = lastRound.totalScore - coursePar;
             document.getElementById('homeToPar').textContent = toPar === 0 ? 'E' : (toPar > 0 ? '+' + toPar : toPar);
             
@@ -2898,7 +2917,7 @@
                 ? '<div class="empty-state"><div class="empty-state-icon">⛳</div><div>Play your first round!</div></div>'
                 : recent.map((r, idx) => {
                 const c = state.courses.find(x => x.id === r.courseId);
-                const par = c ? c.pars.reduce((a,b)=>a+b,0) : 72;
+                const par = getRoundPar(r);
                 const tp = r.totalScore - par;
                 const tpStr = tp === 0 ? 'E' : (tp > 0 ? '+' + tp : tp);
                 const d = new Date(r.date);
@@ -3097,7 +3116,7 @@
             
             rounds.forEach(round => {
                 const course = state.courses.find(c => c.id === round.courseId);
-                const coursePar = course ? course.pars.reduce((a,b)=>a+b,0) : 72;
+                const coursePar = getRoundPar(round);
                 
                 if (round.totalScore) {
                     totalScore += round.totalScore;
@@ -3233,7 +3252,7 @@
             const sorted = [...state.rounds].reverse();
             document.getElementById('historyList').innerHTML = sorted.map((r, idx) => {
                 const c = state.courses.find(x => x.id === r.courseId);
-                const par = c ? c.pars.reduce((a,b)=>a+b,0) : 72;
+                const par = getRoundPar(r);
                 const tp = r.totalScore - par;
                 const tpStr = tp === 0 ? 'E' : (tp > 0 ? '+' + tp : tp);
                 const d = new Date(r.date);
@@ -3419,7 +3438,14 @@
         // ==================== COURSES TAB ====================
         function updateCoursesTab() {
             updateCourseSelect();
-            
+
+            // Reset the add/edit form each time this tab is (re)opened
+            editingCourseId = null;
+            document.getElementById('courseFormTitle').textContent = 'Add New Course';
+            document.getElementById('courseFormBtn').textContent = 'Add Course';
+            document.getElementById('newCourseName').value = '';
+            document.getElementById('newCoursePars').value = '';
+
             if (state.courses.length === 0) {
                 document.getElementById('coursesList').innerHTML = '<div class="empty-state"><div>No courses added yet</div></div>';
                 return;
@@ -3431,7 +3457,10 @@
                         <div class="course-name">${escapeHtml(c.name)}</div>
                         <div class="course-par">Par ${c.pars.reduce((a,b)=>a+b,0)}</div>
                     </div>
-                    <div class="course-delete" onclick="deleteCourse(${c.id})">🗑️</div>
+                    <div class="course-actions">
+                        <div class="course-edit" onclick="editCourse(${c.id})">✏️</div>
+                        <div class="course-delete" onclick="deleteCourse(${c.id})">🗑️</div>
+                    </div>
                 </div>
             `).join('');
         }
@@ -3451,14 +3480,29 @@
             
             const pars = parsStr.split(',').map(p => parseInt(p.trim())).filter(p => !isNaN(p) && p >= 3 && p <= 5);
             if (pars.length !== 18) { alert('Please enter exactly 18 valid pars (3, 4, or 5)'); return; }
-            
-            state.courses.push({ id: Date.now(), name, pars });
+
+            if (editingCourseId !== null) {
+                // Save edits to an existing course. Past rounds keep their own
+                // stored pars, so their scores are unaffected.
+                const course = state.courses.find(c => c.id === editingCourseId);
+                if (course) { course.name = name; course.pars = pars; }
+            } else {
+                state.courses.push({ id: Date.now(), name, pars });
+            }
             saveState();
-            
-            document.getElementById('newCourseName').value = '';
-            document.getElementById('newCoursePars').value = '';
-            
-            updateCoursesTab();
+
+            updateCoursesTab(); // re-renders list and clears/resets the form
+        }
+
+        function editCourse(id) {
+            const course = state.courses.find(c => c.id === id);
+            if (!course) return;
+            editingCourseId = id;
+            document.getElementById('newCourseName').value = course.name;
+            document.getElementById('newCoursePars').value = course.pars.join(',');
+            document.getElementById('courseFormTitle').textContent = 'Edit Course';
+            document.getElementById('courseFormBtn').textContent = 'Save Changes';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
         function deleteCourse(id) {
@@ -4394,13 +4438,13 @@
                 text.textContent = '"Tweet tweet"';
                 if (soundOn) document.getElementById('birdieSound').play().catch(() => {});
                 overlay.classList.add('show');
-                setTimeout(() => overlay.classList.remove('show'), 2000);
+                setTimeout(() => overlay.classList.remove('show'), 1200);
             } else if (type === 'eagle') {
                 icon.textContent = '🦅';
                 text.textContent = '"KREEEEE!"';
                 if (soundOn) document.getElementById('eagleSound').play().catch(() => {});
                 overlay.classList.add('show');
-                setTimeout(() => overlay.classList.remove('show'), 3500);
+                setTimeout(() => overlay.classList.remove('show'), 2000);
             }
         }
         
