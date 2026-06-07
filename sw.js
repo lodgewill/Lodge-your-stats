@@ -1,8 +1,9 @@
-const CACHE_NAME = 'golf-stats-v33';
+const CACHE_NAME = 'golf-stats-v34';
 const urlsToCache = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './html2canvas.min.js'
 ];
 
 self.addEventListener('install', event => {

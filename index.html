@@ -2159,7 +2159,7 @@
             }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- html2canvas is bundled locally (html2canvas.min.js) and loaded only when sharing a round -->
 </head>
 <body>
     <!-- ==================== HEADER ==================== -->
@@ -2549,7 +2549,20 @@
         let pendingCelebration = null;
         let finishAttempted = false;
         let editingRoundIndex = null;
-        
+
+        // ==================== UTILITIES ====================
+        // Escape user-entered text before putting it into the page as HTML,
+        // so a name/course like "<b>" or an imported backup can't inject markup.
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         // ==================== STORAGE ====================
         function loadState() {
             const defaultCourses = [
@@ -2625,19 +2638,59 @@
             URL.revokeObjectURL(url);
         }
         
+        // Returns null if the backup looks valid, otherwise a plain-English reason.
+        function validateBackup(data) {
+            if (!data || typeof data !== 'object') return 'The file is not in the expected format.';
+            if (typeof data.profile !== 'object' || data.profile === null) return 'It is missing your profile information.';
+            if (!Array.isArray(data.courses)) return 'It is missing the list of courses.';
+            if (!Array.isArray(data.rounds)) return 'It is missing the list of rounds.';
+            for (const c of data.courses) {
+                if (!c || typeof c.name !== 'string' || !Array.isArray(c.pars) ||
+                    c.pars.length !== 18 || !c.pars.every(p => typeof p === 'number')) {
+                    return 'One of the courses has invalid data.';
+                }
+            }
+            for (const r of data.rounds) {
+                if (!r || !Array.isArray(r.holes)) return 'One of the rounds has invalid data.';
+            }
+            return null;
+        }
+
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
+                let data;
                 try {
-                    state = JSON.parse(e.target.result);
-                    saveState();
-                    alert('Data imported successfully!');
-                    location.reload();
+                    data = JSON.parse(e.target.result);
                 } catch (err) {
-                    alert('Error importing: ' + err.message);
+                    alert("This file isn't valid backup data, so nothing was changed.");
+                    event.target.value = '';
+                    return;
                 }
+
+                const problem = validateBackup(data);
+                if (problem) {
+                    alert('This backup looks invalid, so nothing was changed.\n\n' + problem);
+                    event.target.value = '';
+                    return;
+                }
+
+                if (!confirm(`This will REPLACE all your current data (${state.rounds.length} rounds, ${state.courses.length} courses) with this backup. Continue?`)) {
+                    event.target.value = '';
+                    return;
+                }
+
+                try {
+                    // Safety net: keep a copy of the current data before overwriting.
+                    localStorage.setItem('golfStatsAppV2_preimport', JSON.stringify(state));
+                } catch (err) { /* ignore if storage is full */ }
+
+                state = data;
+                saveState();
+                alert('Data imported successfully!');
+                location.reload();
             };
             reader.readAsText(file);
         }
@@ -2857,7 +2910,7 @@
                 const d = new Date(r.date);
                 return `<div class="recent-round-row" onclick="showRoundDetail(${state.rounds.length - 1 - idx})">
                     <div class="recent-round-info">
-                        <div class="course-name">${r.courseName}</div>
+                        <div class="course-name">${escapeHtml(r.courseName)}</div>
                         <div class="round-date">${d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
                     </div>
                     <div class="recent-round-scores">
@@ -3192,7 +3245,7 @@
                 const d = new Date(r.date);
                 return `<div class="list-item" onclick="showHistoryDetail(${state.rounds.length - 1 - idx})">
                     <div>
-                        <div class="list-item-title">${r.courseName}</div>
+                        <div class="list-item-title">${escapeHtml(r.courseName)}</div>
                         <div class="list-item-sub">${d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
                     </div>
                     <div class="list-item-right">
@@ -3224,7 +3277,7 @@
                         <div class="summary-title">${d.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
                         <div class="summary-score">${round.totalScore || '--'}</div>
                         <div class="summary-to-par">${toParStr}</div>
-                        <div class="summary-course">${round.courseName}</div>
+                        <div class="summary-course">${escapeHtml(round.courseName)}</div>
                     </div>
                     <div class="section-header" style="margin-top:0;">
                         <span class="section-title">Scorecard</span>
@@ -3252,6 +3305,18 @@
             `;
         }
         
+        // Load the bundled html2canvas only when it's actually needed (first share).
+        function ensureHtml2Canvas() {
+            if (window.html2canvas) return Promise.resolve();
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = 'html2canvas.min.js';
+                s.onload = () => resolve();
+                s.onerror = () => reject(new Error('Could not load the image library.'));
+                document.head.appendChild(s);
+            });
+        }
+
         async function shareRoundImage(event) {
             const element = document.getElementById('shareableContent');
             if (!element) return;
@@ -3262,7 +3327,10 @@
                 const originalText = shareBtn.textContent;
                 shareBtn.textContent = 'Generating...';
                 shareBtn.disabled = true;
-                
+
+                // Make sure the screenshot library is loaded (lazy-loaded on first use)
+                await ensureHtml2Canvas();
+
                 // Capture the element as canvas
                 const canvas = await html2canvas(element, {
                     backgroundColor: '#fafaf9',
@@ -3366,7 +3434,7 @@
             document.getElementById('coursesList').innerHTML = state.courses.map(c => `
                 <div class="course-item">
                     <div>
-                        <div class="course-name">${c.name}</div>
+                        <div class="course-name">${escapeHtml(c.name)}</div>
                         <div class="course-par">Par ${c.pars.reduce((a,b)=>a+b,0)}</div>
                     </div>
                     <div class="course-delete" onclick="deleteCourse(${c.id})">🗑️</div>
@@ -3377,7 +3445,7 @@
         function updateCourseSelect() {
             const select = document.getElementById('courseSelect');
             select.innerHTML = '<option value="">Choose a course...</option>' + 
-                state.courses.map(c => `<option value="${c.id}">${c.name} (Par ${c.pars.reduce((a,b)=>a+b,0)})</option>`).join('');
+                state.courses.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (Par ${c.pars.reduce((a,b)=>a+b,0)})</option>`).join('');
         }
         
         function addCourse() {
@@ -3584,7 +3652,7 @@
         function generatePlayScorecardContent(round, course, playerName) {
             const front9 = round.holes.slice(0, 9);
             const back9 = round.holes.slice(9, 18);
-            const nameLabel = playerName || 'TO PAR';
+            const nameLabel = playerName ? escapeHtml(playerName) : 'TO PAR';
             
             function isHoleIncomplete(hole) {
                 if (hole.score === 0 || hole.score === null) return true;
@@ -3726,7 +3794,7 @@
             const holes = round.holes;
             const front9 = holes.slice(0, 9);
             const back9 = holes.slice(9, 18);
-            const nameLabel = playerName || 'TO PAR';
+            const nameLabel = playerName ? escapeHtml(playerName) : 'TO PAR';
             
             function getScoreDisplay(hole) {
                 if (hole.score === null || hole.score === 0) return '-';
