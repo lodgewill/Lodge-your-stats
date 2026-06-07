@@ -12,13 +12,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        /* Base reset for <button> so semantic buttons can replace clickable divs
+           without changing their appearance (class styles still take over). */
+        button { font-family: inherit; font-size: inherit; color: inherit; background: none; border: none; cursor: pointer; -webkit-appearance: none; appearance: none; }
         
         :root {
             --bg: #ffffff;
             --text: #333;
             --text-light: #666;
             --text-lighter: #888;
-            --text-faint: #aaa;
+            --text-faint: #767676;
             --border: #e8e8e8;
             --border-light: #ddd;
             --card-bg: #fff;
@@ -2177,7 +2181,7 @@
                 <div class="tagline">"Drive for show, putt for dough"</div>
                 <div class="greeting" id="greeting"></div>
             </div>
-            <div class="profile-btn" id="profileBtn" onclick="showProfile()">👤</div>
+            <button type="button" class="profile-btn" id="profileBtn" onclick="showProfile()" aria-label="Profile and settings">👤</button>
         </div>
     </header>
     
@@ -2193,7 +2197,7 @@
 
     <!-- ==================== FUNNY MODAL ==================== -->
     <div class="modal-overlay" id="funnyModal">
-        <div class="modal">
+        <div class="modal" role="dialog" aria-modal="true" aria-label="Start round confirmation">
             <div class="modal-icon">🏌️‍♂️</div>
             <div class="modal-title">Do you agree Will Lodge is a much better golfer than you?<br><br>To accept and continue scoring, select 'Yes'</div>
             <div class="modal-buttons">
@@ -2205,7 +2209,7 @@
 
     <!-- ==================== INCOMPLETE MODAL ==================== -->
     <div class="modal-overlay" id="incompleteModal">
-        <div class="modal">
+        <div class="modal" role="dialog" aria-modal="true" aria-label="Incomplete data">
             <div class="modal-icon">⚠️</div>
             <div class="modal-title">Incomplete Data</div>
             <div style="text-align:left;max-height:200px;overflow-y:auto;margin:12px 0;" id="incompleteHolesList"></div>
@@ -2218,7 +2222,7 @@
 
     <!-- ==================== FINISH CONFIRMATION MODAL ==================== -->
     <div class="modal-overlay" id="finishModal">
-        <div class="modal">
+        <div class="modal" role="dialog" aria-modal="true" aria-label="Submit score">
             <div class="modal-icon">⛳</div>
             <div class="modal-title">Would you like to submit your score?</div>
             <div class="modal-buttons">
@@ -2233,7 +2237,7 @@
         <div class="profile-avatar" id="profileAvatar">👤</div>
         
         <div class="form-group">
-            <label class="form-label">Your Name</label>
+            <label class="form-label" for="inputName">Your Name</label>
             <input type="text" class="form-input" id="inputName" placeholder="Enter your name">
         </div>
         
@@ -2246,7 +2250,7 @@
                 <div class="toggle-label">Sound Effects</div>
                 <div class="toggle-sub">Birdie & eagle celebrations</div>
             </div>
-            <div class="toggle-switch on" id="soundToggle" onclick="toggleSound()"></div>
+            <button type="button" class="toggle-switch on" id="soundToggle" onclick="toggleSound()" aria-label="Sound effects" aria-pressed="true"></button>
         </div>
         
         <div class="section-title" style="margin-left:0;">Data</div>
@@ -2318,7 +2322,7 @@
         <div id="playSetup">
             <div class="setup-card">
                 <div class="setup-card-title">Select Course</div>
-                <select class="form-select" id="courseSelect" onchange="onCourseSelect()">
+                <select class="form-select" id="courseSelect" onchange="onCourseSelect()" aria-label="Select a course">
                     <option value="">Choose a course...</option>
                 </select>
             </div>
@@ -2391,19 +2395,19 @@
         </div>
         
         <div class="filter-row">
-            <div class="pill" data-filter="6m" onclick="setFilter('6m')">6 Months</div>
-            <div class="pill active" data-filter="1y" onclick="setFilter('1y')">Year</div>
-            <div class="pill" data-filter="all" onclick="setFilter('all')">All Time</div>
-            <div class="pill" data-filter="custom" onclick="setFilter('custom')">Custom</div>
+            <button type="button" class="pill" data-filter="6m" onclick="setFilter('6m')">6 Months</button>
+            <button type="button" class="pill active" data-filter="1y" onclick="setFilter('1y')">Year</button>
+            <button type="button" class="pill" data-filter="all" onclick="setFilter('all')">All Time</button>
+            <button type="button" class="pill" data-filter="custom" onclick="setFilter('custom')">Custom</button>
         </div>
         
         <div class="custom-dates" id="customDates">
             <div class="form-group">
-                <label class="form-label">From</label>
+                <label class="form-label" for="filterFrom">From</label>
                 <input type="date" id="filterFrom" onchange="applyCustomFilter()">
             </div>
             <div class="form-group">
-                <label class="form-label">To</label>
+                <label class="form-label" for="filterTo">To</label>
                 <input type="date" id="filterTo" onchange="applyCustomFilter()">
             </div>
         </div>
@@ -2430,7 +2434,7 @@
             <div class="list-container" id="historyList"></div>
         </div>
         <div class="history-detail" id="historyDetail">
-            <div class="history-back" onclick="hideHistoryDetail()">← Back to History</div>
+            <button type="button" class="history-back" onclick="hideHistoryDetail()">← Back to History</button>
             <div id="historyDetailContent"></div>
         </div>
     </div>
@@ -2474,7 +2478,7 @@
 
     <!-- ==================== COURSES TAB ==================== -->
     <div class="tab" id="coursesTab">
-        <div class="history-back" onclick="showTab('playTab')" style="padding:16px 20px 0 4px;">← Back</div>
+        <button type="button" class="history-back" onclick="showTab('playTab')" style="padding:16px 20px 0 4px;">← Back</button>
         <div class="header" style="padding-top:24px;">
             <div class="app-name">Courses</div>
         </div>
@@ -2482,10 +2486,10 @@
         <div class="setup-card">
             <div class="setup-card-title" id="courseFormTitle">Add New Course</div>
             <div class="form-group" style="margin-bottom:16px;">
-                <input type="text" class="form-input" id="newCourseName" placeholder="Course name">
+                <input type="text" class="form-input" id="newCourseName" placeholder="Course name" aria-label="Course name">
             </div>
             <div class="form-group" style="margin-bottom:16px;">
-                <input type="text" class="form-input" id="newCoursePars" placeholder="Pars (e.g., 4,3,5,4,4,3,4,5,4...)">
+                <input type="text" class="form-input" id="newCoursePars" placeholder="Pars (e.g., 4,3,5,4,4,3,4,5,4...)" aria-label="Course pars, 18 numbers separated by commas">
             </div>
             <button class="btn btn-primary" id="courseFormBtn" onclick="addCourse()" style="width:100%;margin:0;">Add Course</button>
         </div>
@@ -2498,22 +2502,22 @@
 
     <!-- ==================== NAVIGATION ==================== -->
     <nav class="nav" id="mainNav">
-        <div class="nav-item active" onclick="showTab('homeTab')">
+        <button type="button" class="nav-item active" onclick="showTab('homeTab')">
             <span class="nav-icon">⌂</span>
             Home
-        </div>
-        <div class="nav-item" onclick="showTab('playTab')">
+        </button>
+        <button type="button" class="nav-item" onclick="showTab('playTab')">
             <span class="nav-icon">▶</span>
             Play
-        </div>
-        <div class="nav-item" onclick="showTab('statsTab')">
+        </button>
+        <button type="button" class="nav-item" onclick="showTab('statsTab')">
             <span class="nav-icon">◈</span>
             Stats
-        </div>
-        <div class="nav-item" onclick="showTab('historyTab')">
+        </button>
+        <button type="button" class="nav-item" onclick="showTab('historyTab')">
             <span class="nav-icon">≡</span>
             History
-        </div>
+        </button>
     </nav>
 
     <!-- ==================== CELEBRATION ==================== -->
@@ -2719,7 +2723,10 @@
             
             document.getElementById('inputName').value = state.profile.name || '';
             updateProfileAvatar();
-            document.getElementById('soundToggle').classList.toggle('on', state.profile.soundEnabled !== false);
+            const soundOn = state.profile.soundEnabled !== false;
+            const t = document.getElementById('soundToggle');
+            t.classList.toggle('on', soundOn);
+            t.setAttribute('aria-pressed', String(soundOn));
         }
         
         function hideProfile() {
@@ -2741,7 +2748,9 @@
         
         function toggleSound() {
             state.profile.soundEnabled = !state.profile.soundEnabled;
-            document.getElementById('soundToggle').classList.toggle('on', state.profile.soundEnabled);
+            const t = document.getElementById('soundToggle');
+            t.classList.toggle('on', state.profile.soundEnabled);
+            t.setAttribute('aria-pressed', String(state.profile.soundEnabled));
             saveState();
         }
         
@@ -2781,7 +2790,9 @@
         
         // ==================== FUNNY MODAL ====================
         function showFunnyModal() {
-            document.getElementById('funnyModal').classList.add('show');
+            const m = document.getElementById('funnyModal');
+            m.classList.add('show');
+            m.querySelector('.modal-btn.primary').focus();
         }
         
         function closeFunnyModal() {
@@ -3612,6 +3623,15 @@
                 dropdown.classList.remove('show');
             }
         });
+
+        // Press Escape (or Android back) to close an open pop-up dialog or menu.
+        document.addEventListener('keydown', function(event) {
+            if (event.key !== 'Escape') return;
+            const openModal = document.querySelector('.modal-overlay.show');
+            if (openModal) { openModal.classList.remove('show'); return; }
+            const menu = document.getElementById('menuDropdown');
+            if (menu && menu.classList.contains('show')) menu.classList.remove('show');
+        });
         
         function renderScorecard() {
             if (!state.currentRound) return;
@@ -4333,7 +4353,9 @@
         }
         
         function showFinishConfirmation() {
-            document.getElementById('finishModal').classList.add('show');
+            const m = document.getElementById('finishModal');
+            m.classList.add('show');
+            m.querySelector('.modal-btn.primary').focus();
         }
         
         function closeFinishModal() {
@@ -4358,6 +4380,7 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
             modal.classList.add('show');
+            document.getElementById('goToFirstIncomplete').focus();
         }
         
         function closeIncompleteModal() {
