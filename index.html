@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#1c4932">
@@ -2750,18 +2750,12 @@
         }
         
         function continueScoring() {
-            // Find first unscored hole (hole where score equals par - meaning untouched)
+            // Jump to the first hole that still has no score entered.
+            // New holes start at score 0, so "unscored" = score is 0 or empty.
             if (state.currentRound) {
-                let firstUnscored = 0;
-                for (let i = 0; i < state.currentRound.holes.length; i++) {
-                    const h = state.currentRound.holes[i];
-                    // Consider a hole "unscored" if it still has default values
-                    if (h.score === h.par && h.putts === 2 && !h.fairway && !h.upDownAttempt) {
-                        firstUnscored = i;
-                        break;
-                    }
-                    firstUnscored = i + 1;
-                }
+                let firstUnscored = state.currentRound.holes.findIndex(h => !h.score);
+                // If every hole already has a score, go to the last hole.
+                if (firstUnscored === -1) firstUnscored = state.currentRound.holes.length - 1;
                 currentHoleIndex = Math.min(firstUnscored, 17);
             }
             showTab('playTab');
@@ -3247,7 +3241,7 @@
                     <div style="text-align:center;padding:16px 20px 0;color:var(--text-faint);font-size:11px;">Lodge your stats ⛳</div>
                 </div>
                 <div style="padding: 0 20px 12px;">
-                    <button class="btn btn-primary" onclick="shareRoundImage()">📤 Share Round</button>
+                    <button class="btn btn-primary" onclick="shareRoundImage(event)">📤 Share Round</button>
                 </div>
                 <div style="padding: 0 20px 12px;">
                     <button class="btn btn-secondary" onclick="editRound(${roundIndex})">✏️ Edit Round</button>
@@ -3258,10 +3252,10 @@
             `;
         }
         
-        async function shareRoundImage() {
+        async function shareRoundImage(event) {
             const element = document.getElementById('shareableContent');
             if (!element) return;
-            
+
             try {
                 // Show loading state
                 const shareBtn = event.target;
@@ -4327,22 +4321,22 @@
         
         // ==================== CELEBRATION ====================
         function showCelebration(type) {
-            if (!state.profile.soundEnabled) return;
-            
+            // The visual popup always shows; only the sound respects the toggle.
+            const soundOn = state.profile.soundEnabled !== false;
             const overlay = document.getElementById('celebration');
             const icon = document.getElementById('celebrationIcon');
             const text = document.getElementById('celebrationText');
-            
+
             if (type === 'birdie') {
                 icon.textContent = '🐦';
                 text.textContent = '"Tweet tweet"';
-                document.getElementById('birdieSound').play().catch(() => {});
+                if (soundOn) document.getElementById('birdieSound').play().catch(() => {});
                 overlay.classList.add('show');
                 setTimeout(() => overlay.classList.remove('show'), 2000);
             } else if (type === 'eagle') {
                 icon.textContent = '🦅';
                 text.textContent = '"KREEEEE!"';
-                document.getElementById('eagleSound').play().catch(() => {});
+                if (soundOn) document.getElementById('eagleSound').play().catch(() => {});
                 overlay.classList.add('show');
                 setTimeout(() => overlay.classList.remove('show'), 3500);
             }
