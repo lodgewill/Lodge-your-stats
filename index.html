@@ -2536,13 +2536,18 @@
         
         
         // ==================== APP STATE ====================
-        let state = {
-            profile: { name: '', soundEnabled: true },
-            courses: [
+        // Default courses, returned fresh each call so copies never share references.
+        function makeDefaultCourses() {
+            return [
                 { id: 1, name: 'Rosebud 🐐 (North)', pars: [4,4,4,3,4,4,3,4,5,4,3,4,3,4,5,5,4,4] },
                 { id: 2, name: 'Rosebud 🐐 (South)', pars: [4,5,4,3,5,4,4,3,4,4,5,3,4,3,4,4,5,4] },
                 { id: 3, name: 'Yas Links', pars: [4,5,4,3,4,4,5,3,4,4,5,4,3,4,4,4,3,5] }
-            ],
+            ];
+        }
+
+        let state = {
+            profile: { name: '', soundEnabled: true },
+            courses: makeDefaultCourses(),
             rounds: [],
             currentRound: null,
             editingRoundIndex: null
@@ -2582,11 +2587,7 @@
 
         // ==================== STORAGE ====================
         function loadState() {
-            const defaultCourses = [
-                { id: 1, name: 'Rosebud 🐐 (North)', pars: [4,4,4,3,4,4,3,4,5,4,3,4,3,4,5,5,4,4] },
-                { id: 2, name: 'Rosebud 🐐 (South)', pars: [4,5,4,3,5,4,4,3,4,4,5,3,4,3,4,4,5,4] },
-                { id: 3, name: 'Yas Links', pars: [4,5,4,3,4,4,5,3,4,4,5,4,3,4,4,4,3,5] }
-            ];
+            const defaultCourses = makeDefaultCourses();
             
             // One-time cleanup of test/sample data
             if (!localStorage.getItem('testDataCleared_v32')) {
@@ -3117,7 +3118,7 @@
             let totalScore = 0, totalPar = 0, scores = [];
             let fwHit = 0, fwTotal = 0, girHit = 0, girTotal = 0;
             let totalPutts = 0, holesWithPutts = 0;
-            let birdies = 0, eagles = 0;
+            let birdies = 0;
             let udMade = 0, udAttempts = 0;
             let gettableMade = 0, gettableTotal = 0;
             let par3Score = 0, par3Count = 0, par4Score = 0, par4Count = 0, par5Score = 0, par5Count = 0;
@@ -3140,7 +3141,6 @@
                     
                     const diff = h.score - h.par;
                     if (diff === -1) birdies++;
-                    if (diff <= -2) eagles++;
                     
                     // Auto-calculate GIR
                     const gir = calculateGIR(h.score, h.putts, h.par);
@@ -4208,95 +4208,6 @@
             document.getElementById('liveScore').textContent = diff === 0 ? 'E' : (diff > 0 ? '+' + diff : diff);
         }
         
-        function prevHole() {
-            if (currentHoleIndex > 0) {
-                // Complete any pending animation immediately
-                if (animationInProgress) {
-                    completePendingAnimation();
-                }
-                
-                const track = document.getElementById('carouselTrack');
-                
-                // Animate to previous panel (slide right to show prev panel)
-                track.style.transform = 'translateX(0%)';
-                
-                // Set up pending animation
-                animationInProgress = true;
-                pendingHoleChange = { direction: 'prev', celebration: null };
-                
-                pendingAnimationTimeout = setTimeout(() => {
-                    currentHoleIndex--;
-                    pendingCelebration = null;
-                    if (scorecardVisible) {
-                        scorecardVisible = false;
-                        document.getElementById('scorecardContainer').classList.remove('show');
-                        document.getElementById('playActive').classList.remove('scorecard-open');
-            document.getElementById('playTab').classList.remove('scorecard-open');
-                        document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
-                    }
-                    
-                    // Re-render panels and reset position instantly
-                    renderCarouselPanels();
-                    updateProgressBar();
-                    updateScorecard();
-                    
-                    animationInProgress = false;
-                    pendingHoleChange = null;
-                    pendingAnimationTimeout = null;
-                    
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 150);
-            }
-        }
-        
-        function nextHole() {
-            // Complete any pending animation immediately
-            if (animationInProgress) {
-                completePendingAnimation();
-            }
-            
-            // Trigger celebration if pending
-            if (pendingCelebration) {
-                showCelebration(pendingCelebration);
-                pendingCelebration = null;
-            }
-            
-            if (currentHoleIndex < 17) {
-                const track = document.getElementById('carouselTrack');
-                
-                // Animate to next panel (slide left to show next panel)
-                track.style.transform = 'translateX(-66.666%)';
-                
-                // Set up pending animation
-                animationInProgress = true;
-                pendingHoleChange = { direction: 'next', celebration: null };
-                
-                pendingAnimationTimeout = setTimeout(() => {
-                    currentHoleIndex++;
-                    if (scorecardVisible) {
-                        scorecardVisible = false;
-                        document.getElementById('scorecardContainer').classList.remove('show');
-                        document.getElementById('playActive').classList.remove('scorecard-open');
-            document.getElementById('playTab').classList.remove('scorecard-open');
-                        document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
-                    }
-                    
-                    // Re-render panels and reset position instantly
-                    renderCarouselPanels();
-                    updateProgressBar();
-                    updateScorecard();
-                    
-                    animationInProgress = false;
-                    pendingHoleChange = null;
-                    pendingAnimationTimeout = null;
-                    
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 150);
-            } else {
-                finishRound();
-            }
-        }
-        
         function finishRound() {
             // Validate mandatory fields
             const incompleteHoles = [];
@@ -4368,7 +4279,6 @@
         }
         
         function showIncompleteModal(incompleteHoles) {
-            const holesList = incompleteHoles.map(h => `Hole ${h.hole}: ${h.issues.join(', ')}`).join('\n');
             const modal = document.getElementById('incompleteModal');
             document.getElementById('incompleteHolesList').innerHTML = incompleteHoles.map(h => 
                 `<div style="padding:8px 0;border-bottom:1px solid var(--border);"><strong>Hole ${h.hole}:</strong> ${h.issues.join(', ')}</div>`
@@ -4483,6 +4393,16 @@
         let pendingAnimationTimeout = null;
         let pendingHoleChange = null;
         
+        // Collapse the scorecard view if it's open (shared by hole navigation).
+        function closeScorecardIfOpen() {
+            if (!scorecardVisible) return;
+            scorecardVisible = false;
+            document.getElementById('scorecardContainer').classList.remove('show');
+            document.getElementById('playActive').classList.remove('scorecard-open');
+            document.getElementById('playTab').classList.remove('scorecard-open');
+            document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
+        }
+
         function completePendingAnimation() {
             if (!animationInProgress || !pendingHoleChange) return;
             
@@ -4514,13 +4434,7 @@
             updateProgressBar();
             updateScorecard();
             
-            if (scorecardVisible) {
-                scorecardVisible = false;
-                document.getElementById('scorecardContainer').classList.remove('show');
-                document.getElementById('playActive').classList.remove('scorecard-open');
-            document.getElementById('playTab').classList.remove('scorecard-open');
-                document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
-            }
+            closeScorecardIfOpen();
             
             // Reset animation state
             animationInProgress = false;
@@ -4782,13 +4696,7 @@
                         updateProgressBar();
                         updateScorecard();
                         
-                        if (scorecardVisible) {
-                            scorecardVisible = false;
-                            document.getElementById('scorecardContainer').classList.remove('show');
-                            document.getElementById('playActive').classList.remove('scorecard-open');
-            document.getElementById('playTab').classList.remove('scorecard-open');
-                            document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
-                        }
+                        closeScorecardIfOpen();
                         
                         animationInProgress = false;
                         pendingHoleChange = null;
@@ -4828,13 +4736,7 @@
                         updateProgressBar();
                         updateScorecard();
                         
-                        if (scorecardVisible) {
-                            scorecardVisible = false;
-                            document.getElementById('scorecardContainer').classList.remove('show');
-                            document.getElementById('playActive').classList.remove('scorecard-open');
-            document.getElementById('playTab').classList.remove('scorecard-open');
-                            document.getElementById('scorecardToggleBtn').textContent = 'View Scorecard';
-                        }
+                        closeScorecardIfOpen();
                         
                         animationInProgress = false;
                         pendingHoleChange = null;
