@@ -1,7 +1,9 @@
-const CACHE_NAME = 'golf-stats-v38';
+const CACHE_NAME = 'golf-stats-v39';
 const urlsToCache = [
   './',
   './index.html',
+  './styles.css',
+  './app.js',
   './manifest.json',
   './html2canvas.min.js',
   './icon-192.png',
